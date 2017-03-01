@@ -17,10 +17,9 @@ from pyvirtualdisplay import Display
 
 
 MAIN_URL = 'https://www.mos.ru/pgu/ru/services/link/1742/?utm_source=mos&utm_medium=ek&utm_referrer=mos.ru&utm_campaign=popular&utm_term=733533'
-AUTH_URL = 'https://www.mos.ru/api/oauth20/v1/frontend/json/ru/process/enter?redirect=https://www.mos.ru/'
+AUTH_URL = 'https://www.mos.ru/api/oauth20/v1/frontend/json/ru/process/enter?redirect=https://www.mos.ru'
 DATA_FILE = 'sad.data'
 CONF_FILE = 'user.conf'
-
 
 config = SafeConfigParser()
 config.read(CONF_FILE)
@@ -36,18 +35,18 @@ RECIPIENT = config.get('email', 'recipients')
 
 
 def render_page():
-    display = Display(visible=0, size=(1920, 1080)).start()
+    display = Display(visible=0, size=(1024, 768)).start()
     driver = webdriver.Firefox()
     driver.get(AUTH_URL)
+    driver.implicitly_wait(10)
     driver.find_element_by_name("j_username").send_keys(mosUser)
     driver.find_element_by_name("j_password").send_keys(mosPassword)
     driver.find_element_by_id('outerlogin_button').click()
     sleep(5)
     driver.get(MAIN_URL)
-    driver.implicitly_wait(10)
     XPATH1 = "//a[@href='/pgu/ru/application/dogm/77060101/#show_4']"
     driver.find_element_by_xpath(XPATH1).click()
-    sleep(10)
+    sleep(8)
     XPATH2 = ".//*[@id='step_1']/div[3]/fieldset[1]/div/div[1]/div"
     driver.find_element_by_xpath(XPATH2).click()
     sleep(7)
@@ -105,6 +104,7 @@ def check_new_info(dict_cur, dict_prev):
         msg = ''
         for k in diff:
             msg += 'School %s\t: %s ---> %s\n' % (k, dict_prev[k], dict_cur[k])
+        print strftime("%d-%m-%y", localtime())
         print 'Oooops! Something changed'
         print msg
         send_mail(msg)
@@ -115,32 +115,38 @@ def check_new_info(dict_cur, dict_prev):
 
 
 def print_result(info):
+    print strftime("%d-%m-%y", localtime())
     for k, v in info.iteritems():
         print 'School %s \t: %s' % (k, v)
 
 
-if __name__ == '__main__':
-    try:
-# Read Current Data from web page
-        driver, html_current = render_page()
-        soup_current = BeautifulSoup(html_current, 'html.parser')
-        info_current = create_dict_from_soup(soup_current)
+def nothing_new(current_state):
+    print "Nothing New"
+    print_result(current_state)
 
+
+
+if __name__ == '__main__':
+# Read Current Data from web page
+    driver, html_current = render_page()
+    soup_current = BeautifulSoup(html_current, 'html.parser')
+    info_current = create_dict_from_soup(soup_current)
+    print info_current
 # Read previous data from file
-        if not os.path.isfile(DATA_FILE):
-            write_json_to_file(info_current)
-        info_prev = read_json_from_file()
+    if not os.path.isfile(DATA_FILE):
+        write_json_to_file(info_current)
+    info_prev = read_json_from_file()
 
 # Compare values in two dict
-        somethingNew = check_new_info(info_current, info_prev)
-        if somethingNew:
-            print '[+] Done'
-        else:
-            print '\nNothing new'
-            print_result(info_current)
-    except Exception:
-        print 'Oooops. Something goes wrong!!!'
-    finally:
-        driver.quit()
+    somethingNew = check_new_info(info_current, info_prev)
+    if somethingNew:
+        print '[+] Done'
+    else:
+        nothing_new(info_current)
+   # except Exception:
+   #     print Exception
+    driver.quit()
+   #    display.popen.kill()
+
 
 

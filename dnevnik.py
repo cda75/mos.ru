@@ -141,7 +141,7 @@ def print_day(day, lines):
         tmp = []
         for col in columns:
         	txt = col.find('span').text
-                if len(txt) > 45:
+                if len(txt) > 65:
                     txt = 'Немецкий язык'.decode('utf-8')
        		tmp.append(txt.encode(CODING))
         print "{num:3} {subj:35} {grade:16} {task:60} {comment:30}".format(num=tmp[0], subj=tmp[1], task=tmp[2], grade=tmp[3], comment=tmp[4])
