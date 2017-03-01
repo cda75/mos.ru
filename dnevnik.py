@@ -12,13 +12,11 @@ from selenium import webdriver
 # from selenium.webdriver.support import expected_conditions as EC
 #from selenium.webdriver.support.select import Select
 from ConfigParser import SafeConfigParser
-from pyvirtualdisplay import Display
 
-display = Display(visible=0, size=(1920, 1080)).start()
+
 
 CONF_FILE = 'user.conf'
 CODING = sys.stdout.encoding
-OS = platform.system()
 
 config = SafeConfigParser()
 config.read(CONF_FILE)
@@ -29,13 +27,18 @@ emailPassword = config.get('email', 'password')
 SENDER = config.get('email', 'sender')
 SUBJ = config.get('email', 'subject')
 RECIPIENT = config.items('email', 'recipients')
+URL = config.get('diary', 'url')
+DATA_FILE = config.get('diary', 'data_file')
 
+OS = platform.system()
+isLinux = (OS == 'Linux')
+isWindows = (OS == 'Windows')
 
 
 def format_time_dmY(func):
-	def format():
-		return func().strftime("%d.%m.%Y")
-	return format
+    def format():
+        return func().strftime("%d.%m.%Y")
+    return format
 
 
 def html2file(html, fName):
@@ -50,9 +53,13 @@ def read_soup(fName):
 
 
 def render_page():
-    url = 'https://pgu.mos.ru/ru/application/dogm/journal/#step_1'
+    if isLinux:
+        from pyvirtualdisplay import Display
+        display = Display(visible=0, size=(1024, 768)).start()
+    else:
+        display = None
     driver = webdriver.Firefox()
-    driver.get(url)
+    driver.get(URL)
     driver.implicitly_wait(10)
     driver.find_element_by_name("j_username").send_keys(mosUser)
     driver.find_element_by_name("j_password").send_keys(mosPassword)
@@ -60,18 +67,18 @@ def render_page():
     time.sleep(8)
     driver.find_element_by_id("button_next").click()
     time.sleep(5)
-    return driver
+    return (driver, display)
 
 
 def render_next_week():
-	driver = render_page()
-	nextMonday = get_next_Monday_dmY()
-	select = driver.find_element_by_name("next")
-	for i in select.find_elements_by_tag_name('option'):
-		if i.text == nextMonday:
-			i.click()
-			time.sleep(3)
-			return driver
+    driver = render_page()
+    nextMonday = get_next_Monday_dmY()
+    select = driver.find_element_by_name("next")
+    for i in select.find_elements_by_tag_name('option'):
+        if i.text == nextMonday:
+            i.click()
+            time.sleep(3)
+            return driver
 
 
 def write_page_to_file(driver, fName):
@@ -134,23 +141,36 @@ def get_lines(tag):
 
 
 def print_day(day, lines):
+    pattern = 'Иностранный'.decode('utf-8')
     print '\n',day
     data_list = []
     for line in lines:
         columns = line.find_all('div', class_='b-dl-td_column')
         tmp = []
         for col in columns:
-        	txt = col.find('span').text
-                if len(txt) > 65:
-                    txt = 'Немецкий язык'.decode('utf-8')
-       		tmp.append(txt.encode(CODING))
-        print "{num:3} {subj:35} {grade:16} {task:60} {comment:30}".format(num=tmp[0], subj=tmp[1], task=tmp[2], grade=tmp[3], comment=tmp[4])
+            txt = col.find('span').text
+            if pattern in txt:
+                txt = 'Немецкий язык'.decode('utf-8')
+            tmp.append(txt.encode(CODING))
+        print "{num:3} {subj:35} {grade:8} {task:65} {comment:30}".format(num=tmp[0], subj=tmp[1], task=tmp[2], grade=tmp[3], comment=tmp[4])
         data_list.append(tmp)
     return data_list
 
 
 def check_grade():
     pass
+
+
+
+
+def read_json_from_file():
+    with open(DATA_FILE) as f:
+        return json.load(f)
+
+
+def write_json_to_file(info):
+    with open(DATA_FILE, 'w') as f:
+        f.write(json.dumps(info))
 
 
 
@@ -167,8 +187,9 @@ def send_mail(subj, grade):
         print "[-] Error sending email"
     server.quit()
 
+
 def print_day_nextday():
-    drv = render_page()
+    drv, disp = render_page()
     write_page_to_file(drv, 'thisWeek.html')
     soup = read_soup('thisWeek.html')
     today = datetime.now()
@@ -179,6 +200,8 @@ def print_day_nextday():
     lines = get_day(soup, nextDay)
     print_day(nextDay, lines)
     drv.quit()
+    if disp:
+        disp.popen.kill()
 
 
 

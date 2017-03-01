@@ -7,18 +7,18 @@ from bs4 import BeautifulSoup
 from selenium import webdriver
 import re
 from ConfigParser import SafeConfigParser
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import TimeoutException
+# from selenium.webdriver.common.by import By
+# from selenium.webdriver.support.ui import WebDriverWait
+# from selenium.webdriver.support import expected_conditions as EC
+# from selenium.common.exceptions import TimeoutException
 import os.path
-from pyvirtualdisplay import Display
+import platform
 
 
 
 MAIN_URL = 'https://www.mos.ru/pgu/ru/services/link/1742/?utm_source=mos&utm_medium=ek&utm_referrer=mos.ru&utm_campaign=popular&utm_term=733533'
 AUTH_URL = 'https://www.mos.ru/api/oauth20/v1/frontend/json/ru/process/enter?redirect=https://www.mos.ru'
-DATA_FILE = 'sad.data'
+ 
 CONF_FILE = 'user.conf'
 
 config = SafeConfigParser()
@@ -27,15 +27,24 @@ mosUser = config.get('auth', 'user')
 mosPassword = config.get('auth', 'password')
 emailUser = config.get('email', 'user')
 emailPassword = config.get('email', 'password')
-RequestNumber = config.get('auth', 'ReqNum')
-FIO = config.get('auth', 'fio').decode('utf-8')
+RequestNumber = config.get('sad', 'ReqNum')
+FIO = config.get('sad', 'fio').decode('utf-8')
 SENDER = config.get('email', 'sender')
 SUBJ = config.get('email', 'subject')
 RECIPIENT = config.get('email', 'recipients')
+DATA_FILE = config.get('sad', 'data_file')
+
+OS = platform.system()
+isLinux = (OS == 'Linux')
+isWindows = (OS == 'Windows')
 
 
 def render_page():
-    display = Display(visible=0, size=(1024, 768)).start()
+    if isLinux:
+        from pyvirtualdisplay import Display
+        display = Display(visible=0, size=(1024, 768)).start()
+    else:
+        display = None
     driver = webdriver.Firefox()
     driver.get(AUTH_URL)
     driver.implicitly_wait(10)
