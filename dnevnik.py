@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 
-import time
+from time import sleep, localtime, strftime
 import sys
+import json
 import platform
 import smtplib
 from bs4 import BeautifulSoup
@@ -53,21 +54,16 @@ def read_soup(fName):
 
 
 def render_page():
-    if isLinux:
-        from pyvirtualdisplay import Display
-        display = Display(visible=0, size=(1024, 768)).start()
-    else:
-        display = None
     driver = webdriver.Firefox()
     driver.get(URL)
     driver.implicitly_wait(10)
     driver.find_element_by_name("j_username").send_keys(mosUser)
     driver.find_element_by_name("j_password").send_keys(mosPassword)
     driver.find_element_by_id('outerlogin_button').click()
-    time.sleep(8)
+    sleep(8)
     driver.find_element_by_id("button_next").click()
-    time.sleep(5)
-    return (driver, display)
+    sleep(5)
+    return driver
 
 
 def render_next_week():
@@ -77,7 +73,7 @@ def render_next_week():
     for i in select.find_elements_by_tag_name('option'):
         if i.text == nextMonday:
             i.click()
-            time.sleep(3)
+            sleep(3)
             return driver
 
 
@@ -140,6 +136,21 @@ def get_lines(tag):
     return r
 
 
+def lines_to_dict(lines):
+    data_list = []
+    for line in lines:
+        columns = line.find_all('div', class_='b-dl-td_column')
+        tmp = []
+        d = {}
+        for col in columns:
+            txt = col.find('span').text
+            tmp.append(txt)
+        d['num'], d['subj'], d['task'], d['grade'], d['comment'] = tmp
+        data_list.append(d)
+    return data_list
+
+
+
 def print_day(day, lines):
     pattern = 'Иностранный'.decode('utf-8')
     print '\n',day
@@ -157,10 +168,20 @@ def print_day(day, lines):
     return data_list
 
 
-def check_grade():
-    pass
-
-
+def check_grade(dict_cur, dict_prev):
+    diff = [k for k in dict_cur if dict_cur[k] != dict_prev[k]]
+    if diff:
+        msg = ''
+        for k in diff:
+            msg += 'School %s\t: %s ---> %s\n' % (k, dict_prev[k], dict_cur[k])
+        print strftime("%d-%m-%y %H:%M", localtime())
+        print 'Oooops! Something changed'
+        print msg
+        send_mail(msg)
+        write_json_to_file(dict_cur)
+        return True
+    else:
+        return False
 
 
 def read_json_from_file():
@@ -171,7 +192,6 @@ def read_json_from_file():
 def write_json_to_file(info):
     with open(DATA_FILE, 'w') as f:
         f.write(json.dumps(info))
-
 
 
 def send_mail(subj, grade):
@@ -189,7 +209,7 @@ def send_mail(subj, grade):
 
 
 def print_day_nextday():
-    drv, disp = render_page()
+    drv = render_page()
     write_page_to_file(drv, 'thisWeek.html')
     soup = read_soup('thisWeek.html')
     today = datetime.now()
@@ -200,12 +220,14 @@ def print_day_nextday():
     lines = get_day(soup, nextDay)
     print_day(nextDay, lines)
     drv.quit()
-    if disp:
-        disp.popen.kill()
-
 
 
 if __name__ == '__main__':
-    print_day_nextday()
-    
+    soup = read_soup('thisWeek.html')
+    today = datetime.now()
+    day = today.strftime("%d.%m")
+    lines = get_day(soup, day)
+    dd = lines_to_dict(lines)
+    print dd
+    write_json_to_file(dd) 
 
