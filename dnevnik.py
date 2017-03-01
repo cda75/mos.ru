@@ -12,6 +12,9 @@ from selenium import webdriver
 # from selenium.webdriver.support import expected_conditions as EC
 #from selenium.webdriver.support.select import Select
 from ConfigParser import SafeConfigParser
+from pyvirtualdisplay import Display
+
+display = Display(visible=0, size=(1920, 1080)).start()
 
 CONF_FILE = 'user.conf'
 CODING = sys.stdout.encoding
@@ -23,7 +26,9 @@ mosUser = config.get('auth', 'user')
 mosPassword = config.get('auth', 'password')
 emailUser = config.get('email', 'user')
 emailPassword = config.get('email', 'password')
-
+SENDER = config.get('email', 'sender')
+SUBJ = config.get('email', 'subject')
+RECIPIENT = config.items('email', 'recipients')
 
 
 
@@ -46,15 +51,15 @@ def read_soup(fName):
 
 def render_page():
     url = 'https://pgu.mos.ru/ru/application/dogm/journal/#step_1'
-    driver = webdriver.Chrome()
+    driver = webdriver.Firefox()
     driver.get(url)
-    # driver.implicitly_wait(10)
+    driver.implicitly_wait(10)
     driver.find_element_by_name("j_username").send_keys(mosUser)
     driver.find_element_by_name("j_password").send_keys(mosPassword)
     driver.find_element_by_id('outerlogin_button').click()
-    time.sleep(7)
+    time.sleep(8)
     driver.find_element_by_id("button_next").click()
-    time.sleep(3)
+    time.sleep(5)
     return driver
 
 
@@ -130,33 +135,37 @@ def get_lines(tag):
 
 def print_day(day, lines):
     print '\n',day
+    data_list = []
     for line in lines:
         columns = line.find_all('div', class_='b-dl-td_column')
         tmp = []
         for col in columns:
         	txt = col.find('span').text
+                if len(txt) > 45:
+                    txt = 'Немецкий язык'.decode('utf-8')
        		tmp.append(txt.encode(CODING))
-        print "{num:2} {subj:30} {grade:4} {task:67} {comment:30}".format(num=tmp[0], subj=tmp[1], task=tmp[2], grade=tmp[3], comment=tmp[4])
+        print "{num:3} {subj:35} {grade:16} {task:60} {comment:30}".format(num=tmp[0], subj=tmp[1], task=tmp[2], grade=tmp[3], comment=tmp[4])
+        data_list.append(tmp)
+    return data_list
+
+
+def check_grade():
+    pass
+
 
 
 def send_mail(subj, grade):
-    sender = 'Dimka'
-    receiver = ['dchestnov@mail.ru', 'i.chestnova@gmail.com']
-    subj = 'Diary state changed'
     msg_txt = 'I have got a new grade %s on subject %s' % (grade, subj)
-    msg = 'From: %s\nTo: %s\nSubject: %s\n\n%s' % (sender, receiver, subj, msg_txt)
-    user = emailUser
-    passw = emailPassword
+    msg = 'From: %s\nTo: %s\nSubject: %s\n\n%s' % (SENDER, RECIPIENT, SUBJ, msg_txt)
     try:
         server = smtplib.SMTP('smtp.gmail.com:587')
         server.starttls()
-        server.login(user, passw)
-        server.sendmail(sender, receiver, msg)
-        print 'Success'
+        server.login(emailUser, emailPassword)
+        server.sendmail(SENDER, RECIPIENT, msg)
+        print '[+] Email successfully sent'
     except:
-        print "Error"
+        print "[-] Error sending email"
     server.quit()
-
 
 def print_day_nextday():
     drv = render_page()
@@ -169,6 +178,8 @@ def print_day_nextday():
     nextDay = (today + timedelta(1)).strftime("%d.%m")
     lines = get_day(soup, nextDay)
     print_day(nextDay, lines)
+    drv.quit()
+
 
 
 if __name__ == '__main__':
