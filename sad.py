@@ -67,9 +67,9 @@ def render_page():
     driver.find_element_by_id("D_surname").send_keys(FIO)
     driver.find_element_by_id('button_next').click()
     sleep(10)
-    #	element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "D_dou_info")))
+    #   element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "D_dou_info")))
     result = driver.find_element_by_id('D_dou_info')
-    return (driver, result.get_attribute('innerHTML'))
+    return (driver, display, result.get_attribute('innerHTML'))
 
  
 def send_mail(msg_txt):
@@ -134,13 +134,12 @@ def nothing_new(current_state):
     print_result(current_state)
 
 
-
 if __name__ == '__main__':
 # Read Current Data from web page
-    driver, html_current = render_page()
+    driver, display, html_current = render_page()
     soup_current = BeautifulSoup(html_current, 'html.parser')
     info_current = create_dict_from_soup(soup_current)
-    print info_current
+
 # Read previous data from file
     if not os.path.isfile(DATA_FILE):
         write_json_to_file(info_current)
@@ -152,10 +151,9 @@ if __name__ == '__main__':
         print '[+] Done'
     else:
         nothing_new(info_current)
-   # except Exception:
-   #     print Exception
+
     driver.quit()
-   #    display.popen.kill()
+    display.popen.kill()
 
 
 
