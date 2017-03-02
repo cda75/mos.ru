@@ -80,12 +80,11 @@ def render_page():
     driver = webdriver.Firefox()
     driver.implicitly_wait(10)
     driver.get(URL)
-    sleep(3)
     driver.find_element_by_name("j_username").send_keys(mosUser)
     driver.find_element_by_name("j_password").send_keys(mosPassword)
-    sleep(5)
+    sleep(3)
     driver.find_element_by_id('outerlogin_button').click()
-    sleep(7)
+    sleep(10)
     driver.find_element_by_id("button_next").click()
     sleep(7)
     week = driver.find_element_by_class_name("b-diary-st__body")
@@ -214,7 +213,6 @@ def check_day_grades(list_cur, list_prev):
         grade_cur = list_cur[i]['grade']
         grade_prev = list_prev[i]['grade']
         if grade_cur != grade_prev:
-            #print 'Oooops! Something changed'
             diffs.append((subj, grade_cur))
     return diffs
 
@@ -230,7 +228,7 @@ def create_msg_from_diff(diffs):
 
 if __name__ == '__main__':
     drv, html_current = render_page()
-    day = "02.03"
+    day = strftime("%d-%m", localtime())
     soup_current = BeautifulSoup(html_current, 'html.parser')
     info_current = day_to_dict(soup_current, day)
 
@@ -242,5 +240,8 @@ if __name__ == '__main__':
     info_prev = day_to_dict(soup_prev, day)
 
     diff = check_day_grades(info_current, info_prev)
-    print create_msg_from_diff(diff)
+    print 'diff =', diff
+    if diff:
+        msg = create_msg_from_diff(diff)
+        send_mail(msg)
 
