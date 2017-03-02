@@ -196,7 +196,7 @@ def send_alert(diffs):
         subj = diff[0]
         grade = diff[1]
         msg += "%s\t:  %s\n" % (subj, grade)
-    helper.send_mail(emailUser, emailPassword, SENDER, RECIPIENT, SUBJ, msg)
+    helper.send_mail(emailUser, emailPassword, SENDER, RECIPIENT, SUBJ, msg.encode('utf-8'))
 
 
 if __name__ == '__main__':
