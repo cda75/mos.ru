@@ -65,7 +65,7 @@ def render_page():
     result = driver.find_element_by_id('D_dou_info')
     return (driver, result.get_attribute('innerHTML'))
 
- 
+
 def send_mail(msg_txt):
     msg = 'From: %s\nTo: %s\nSubject: %s\n\n%s' % (SENDER, RECIPIENT, SUBJ, msg_txt)
     try:
@@ -129,23 +129,18 @@ def nothing_new(current_state):
 
 
 if __name__ == '__main__':
-# Read Current Data from web page
     driver, html_current = render_page()
     soup_current = BeautifulSoup(html_current, 'html.parser')
     info_current = create_dict_from_soup(soup_current)
 
-# Read previous data from file
     if not os.path.isfile(DATA_FILE):
         write_json_to_file(info_current)
     info_prev = read_json_from_file()
 
-# Compare values in two dict
     somethingNew = check_new_info(info_current, info_prev)
     if somethingNew:
         print '[+] Done'
     else:
         nothing_new(info_current)
+
     driver.quit()
-
-
-
