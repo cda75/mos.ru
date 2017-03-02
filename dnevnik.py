@@ -217,5 +217,5 @@ if __name__ == '__main__':
         msg = create_msg_from_diff(diff)
         helper.send_mail(emailUser, emailPassword, SENDER, RECIPIENT, SUBJ, msg)
         write_soup_to_file(soup_current)
-
+    drv.quit()
 
