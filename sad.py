@@ -1,19 +1,16 @@
 # -*- coding: utf-8 -*-
 
-from time import sleep, strftime, localtime
-import smtplib
-import json
+from time import sleep
 from bs4 import BeautifulSoup
 from selenium import webdriver
 import re
 from ConfigParser import SafeConfigParser
+import os.path
+import helper
 # from selenium.webdriver.common.by import By
 # from selenium.webdriver.support.ui import WebDriverWait
 # from selenium.webdriver.support import expected_conditions as EC
 # from selenium.common.exceptions import TimeoutException
-import os.path
-import platform
-
 
 
 MAIN_URL = 'https://www.mos.ru/pgu/ru/services/link/1742/?utm_source=mos&utm_medium=ek&utm_referrer=mos.ru&utm_campaign=popular&utm_term=733533'
@@ -33,10 +30,6 @@ SUBJ = config.get('email', 'subject')
 RECIPIENT = config.get('email', 'recipients')
 DATA_FILE = config.get('sad', 'data_file')
 
-OS = platform.system()
-isLinux = (OS == 'Linux')
-isWindows = (OS == 'Windows')
-
 
 def render_page():
     driver = webdriver.Firefox()
@@ -55,52 +48,15 @@ def render_page():
     sleep(7)
     XPATH3 = ".//*[@id='step_1']/div[3]/fieldset[1]/div/div[1]/div/div/ul/li[2]"
     driver.find_element_by_xpath(XPATH3).click()
-    #sleep(7)
+    # sleep(7)
     RequestForm = "field[d.internal.RequestNumber]"
     driver.find_element_by_name(RequestForm).send_keys(RequestNumber)
     driver.find_element_by_id("D_surname").send_keys(FIO)
     driver.find_element_by_id('button_next').click()
     sleep(8)
-    #   element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "D_dou_info")))
+    # element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "D_dou_info")))
     result = driver.find_element_by_id('D_dou_info')
     return (driver, result.get_attribute('innerHTML'))
-
-
-def print_line(func):
-    def wrapper(*args, **kwargs):
-        print '----------------------------------------------'
-        return func(*args, **kwargs)
-    return wrapper
-
-
-def add_current_time(func):
-    def wrapper(*args, **kwargs):
-        print strftime("%d.%m.%Y %H:%M", localtime())
-        return func(*args, **kwargs)
-    return wrapper
-
-
-def send_mail(msg_txt):
-    msg = 'From: %s\nTo: %s\nSubject: %s\n\n%s' % (SENDER, RECIPIENT, SUBJ, msg_txt)
-    try:
-        server = smtplib.SMTP('smtp.gmail.com:587')
-        server.starttls()
-        server.login(emailUser, emailPassword)
-        server.sendmail(SENDER, RECIPIENT, msg)
-        print '[+] Email successfully sent'
-    except:
-        print "[-] Error sending email"
-    server.quit()
-
-
-def read_json_from_file():
-    with open(DATA_FILE) as f:
-        return json.load(f)
-
-
-def write_json_to_file(info):
-    with open(DATA_FILE, 'w') as f:
-        f.write(json.dumps(info))
 
 
 def create_dict_from_soup(soup):
@@ -123,21 +79,21 @@ def check_new_info(dict_cur, dict_prev):
             msg += 'School %s\t: %s ---> %s\n' % (k, dict_prev[k], dict_cur[k])
         print 'Oooops! Something changed'
         print msg
-        send_mail(msg)
-        write_json_to_file(dict_cur)
+        helper.send_mail(emailUser, emailPassword, SENDER, RECIPIENT, SUBJ, msg)
+        helper.write_json_to_file(DATA_FILE, dict_cur)
         return True
     else:
         return False
 
 
-@print_line
+@helper.print_line
 def print_result(info):
     for k, v in info.iteritems():
         print 'School %s \t: %s' % (k, v)
 
 
-@print_line
-@add_current_time
+@helper.print_line
+@helper.add_current_time
 def nothing_new(current_state):
     print "Nothing New"
     print_result(current_state)
@@ -149,8 +105,8 @@ if __name__ == '__main__':
     info_current = create_dict_from_soup(soup_current)
 
     if not os.path.isfile(DATA_FILE):
-        write_json_to_file(info_current)
-    info_prev = read_json_from_file()
+        helper.write_json_to_file(DATA_FILE, info_current)
+    info_prev = helper.read_json_from_file(DATA_FILE)
 
     somethingNew = check_new_info(info_current, info_prev)
     if somethingNew:

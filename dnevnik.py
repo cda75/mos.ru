@@ -2,9 +2,6 @@
 
 from time import sleep, localtime, strftime
 import sys
-import json
-import platform
-import smtplib
 from bs4 import BeautifulSoup
 from datetime import datetime, timedelta
 from selenium import webdriver
@@ -14,6 +11,7 @@ from selenium import webdriver
 # from selenium.webdriver.support.select import Select
 from ConfigParser import SafeConfigParser
 import os.path
+import helper
 
 
 CONF_FILE = 'user.conf'
@@ -31,10 +29,6 @@ RECIPIENT = config.items('email', 'recipients')
 URL = config.get('diary', 'url')
 DATA_FILE = config.get('diary', 'data_file')
 
-# OS = platform.system()
-# isLinux = (OS == 'Linux')
-# isWindows = (OS == 'Windows')
-
 
 def format_time_dmY(func):
     def format():
@@ -51,29 +45,6 @@ def read_soup_from_file():
     with open(DATA_FILE) as f:
         soup = BeautifulSoup(f.read(), 'html.parser')
     return soup
-
-
-def read_json_from_file():
-    with open(DATA_FILE) as f:
-        return json.load(f)
-
-
-def write_json_to_file(info):
-    with open(DATA_FILE, 'w') as f:
-        f.write(json.dumps(info))
-
-
-def send_mail(msg_txt):
-    msg = 'From: %s\nTo: %s\nSubject: %s\n\n%s' % (SENDER, RECIPIENT, SUBJ, msg_txt)
-    try:
-        server = smtplib.SMTP('smtp.gmail.com:587')
-        server.starttls()
-        server.login(emailUser, emailPassword)
-        server.sendmail(SENDER, RECIPIENT, msg)
-        print '[+] Email successfully sent'
-    except:
-        print "[-] Error sending email"
-    server.quit()
 
 
 def render_page():
@@ -228,7 +199,7 @@ def create_msg_from_diff(diffs):
 
 if __name__ == '__main__':
     drv, html_current = render_page()
-    day = strftime("%d-%m", localtime())
+    day = strftime("%d.%m", localtime())
     soup_current = BeautifulSoup(html_current, 'html.parser')
     info_current = day_to_dict(soup_current, day)
 
@@ -243,5 +214,5 @@ if __name__ == '__main__':
     print 'diff =', diff
     if diff:
         msg = create_msg_from_diff(diff)
-        send_mail(msg)
+        helper.send_mail(emailUser, emailPassword, SENDER, RECIPIENT, SUBJ, msg)
 
