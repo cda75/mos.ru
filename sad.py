@@ -40,36 +40,31 @@ isWindows = (OS == 'Windows')
 
 
 def render_page():
-    if isLinux:
-        from pyvirtualdisplay import Display
-        display = Display(visible=0, size=(1024, 768)).start()
-    else:
-        display = None
     driver = webdriver.Firefox()
     driver.get(AUTH_URL)
-    driver.implicitly_wait(10)
+    driver.implicitly_wait(15)
     driver.find_element_by_name("j_username").send_keys(mosUser)
     driver.find_element_by_name("j_password").send_keys(mosPassword)
     driver.find_element_by_id('outerlogin_button').click()
-    sleep(5)
+    #sleep(5)
     driver.get(MAIN_URL)
     XPATH1 = "//a[@href='/pgu/ru/application/dogm/77060101/#show_4']"
     driver.find_element_by_xpath(XPATH1).click()
-    sleep(8)
+    #sleep(8)
     XPATH2 = ".//*[@id='step_1']/div[3]/fieldset[1]/div/div[1]/div"
     driver.find_element_by_xpath(XPATH2).click()
-    sleep(7)
+    #sleep(7)
     XPATH3 = ".//*[@id='step_1']/div[3]/fieldset[1]/div/div[1]/div/div/ul/li[2]"
     driver.find_element_by_xpath(XPATH3).click()
-    sleep(7)
+    #sleep(7)
     RequestForm = "field[d.internal.RequestNumber]"
     driver.find_element_by_name(RequestForm).send_keys(RequestNumber)
     driver.find_element_by_id("D_surname").send_keys(FIO)
     driver.find_element_by_id('button_next').click()
-    sleep(10)
+    sleep(8)
     #   element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "D_dou_info")))
     result = driver.find_element_by_id('D_dou_info')
-    return (driver, display, result.get_attribute('innerHTML'))
+    return (driver, result.get_attribute('innerHTML'))
 
  
 def send_mail(msg_txt):
@@ -136,7 +131,7 @@ def nothing_new(current_state):
 
 if __name__ == '__main__':
 # Read Current Data from web page
-    driver, display, html_current = render_page()
+    driver, html_current = render_page()
     soup_current = BeautifulSoup(html_current, 'html.parser')
     info_current = create_dict_from_soup(soup_current)
 
@@ -153,7 +148,6 @@ if __name__ == '__main__':
         nothing_new(info_current)
 
     driver.quit()
-    display.popen.kill()
 
 
 
