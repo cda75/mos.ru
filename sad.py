@@ -18,7 +18,6 @@ import platform
 
 MAIN_URL = 'https://www.mos.ru/pgu/ru/services/link/1742/?utm_source=mos&utm_medium=ek&utm_referrer=mos.ru&utm_campaign=popular&utm_term=733533'
 AUTH_URL = 'https://www.mos.ru/api/oauth20/v1/frontend/json/ru/process/enter?redirect=https://www.mos.ru'
- 
 CONF_FILE = 'user.conf'
 
 config = SafeConfigParser()
@@ -146,7 +145,6 @@ if __name__ == '__main__':
         print '[+] Done'
     else:
         nothing_new(info_current)
-
     driver.quit()
 
 
