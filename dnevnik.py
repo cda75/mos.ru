@@ -20,13 +20,16 @@ CODING = sys.stdout.encoding
 
 config = SafeConfigParser()
 config.read(CONF_FILE)
+
 mosUser = config.get('auth', 'user')
 mosPassword = config.get('auth', 'password')
+
 emailUser = config.get('email', 'user')
 emailPassword = config.get('email', 'password')
 SENDER = config.get('email', 'sender')
 SUBJ = config.get('email', 'subject')
 RECIPIENT = config.get('email', 'recipients')
+
 URL = config.get('diary', 'url')
 DATA_FILE = config.get('diary', 'data_file')
 
