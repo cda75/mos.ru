@@ -32,6 +32,7 @@ def write_json_to_file(fName, info):
 
 def send_mail(emailUser, emailPassword, sender, recipient, subj, msg_txt):
     msg = 'From: %s\nTo: %s\nSubject: %s\n\n%s' % (sender, recipient, subj, msg_txt)
+    print 'email msg:\n', msg
     try:
         server = smtplib.SMTP('smtp.gmail.com:587')
         server.starttls()
