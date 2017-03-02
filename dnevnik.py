@@ -12,6 +12,7 @@ from selenium import webdriver
 from ConfigParser import SafeConfigParser
 import os.path
 import helper
+import unicodedata
 
 
 CONF_FILE = 'user.conf'
@@ -25,7 +26,7 @@ emailUser = config.get('email', 'user')
 emailPassword = config.get('email', 'password')
 SENDER = config.get('email', 'sender')
 SUBJ = config.get('email', 'subject')
-RECIPIENT = config.items('email', 'recipients')
+RECIPIENT = config.get('email', 'recipients')
 URL = config.get('diary', 'url')
 DATA_FILE = config.get('diary', 'data_file')
 
@@ -102,7 +103,6 @@ def get_day(tag, day):
             return [l for l in div.find_all('div', class_='b-dl-table__list') if l.contents[3].span.string]
     else:
         print 'Ooops! Block with date %s not found' % day
-        return False
 
 
 def get_next_day(tag):
@@ -122,7 +122,6 @@ def get_next_week():
 
 
 def get_lines(tag):
-# res = [l for l in tag.find_all('div', class_='b-dl-table__list') if l.contents[3].span.string]
     res = []
     lines = tag.find_all('div', class_='b-dl-table__list')
     for line in lines:
@@ -188,13 +187,13 @@ def check_day_grades(list_cur, list_prev):
     return diffs
 
 
-def create_msg_from_diff(diffs):
-    msg = "\nI have got a new grade"
+def send_alert(diffs):
+    msg = "\nI have got a new grade\n"
     for diff in diffs:
         subj = diff[0]
         grade = diff[1]
         msg += "%s\t:  %s\n" % (subj, grade)
-    return msg
+    helper.send_mail(emailUser, emailPassword, SENDER, RECIPIENT, SUBJ, msg)
 
 
 if __name__ == '__main__':
@@ -202,7 +201,6 @@ if __name__ == '__main__':
     day = strftime("%d.%m", localtime())
     soup_current = BeautifulSoup(html_current, 'html.parser')
     info_current = day_to_dict(soup_current, day)
-
     if not os.path.isfile(DATA_FILE):
         print 'File was absent - no previous info'
         print 'Creating a new week file..........'
@@ -210,12 +208,16 @@ if __name__ == '__main__':
     soup_prev = read_soup_from_file()
     info_prev = day_to_dict(soup_prev, day)
     if len(info_current) > len(info_prev):
+        print "New lessons were added from the last time"
         info_prev.append(info_current[-1])
         write_soup_to_file(soup_current)
     diff = check_day_grades(info_current, info_prev)
     if diff:
-        msg = create_msg_from_diff(diff)
-        helper.send_mail(emailUser, emailPassword, SENDER, RECIPIENT, SUBJ, msg)
+        print "Sending e-mail ...."
+        send_alert(diff)
         write_soup_to_file(soup_current)
+        print "Week file was refreshed"
+    else:
+        print 'No new grades'
     drv.quit()
 

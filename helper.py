@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import smtplib
 import json
 import platform
@@ -38,7 +40,8 @@ def send_mail(emailUser, emailPassword, sender, recipient, subj, msg_txt):
         print '[+] Email successfully sent'
     except:
         print "[-] Error sending email"
-    server.quit()
+    finally:
+        server.quit()
 
 
 def get_OS():
