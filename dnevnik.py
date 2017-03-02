@@ -163,7 +163,7 @@ def print_day(day, lines):
             if pattern in txt:
                 txt = 'Немецкий язык'.decode('utf-8')
             tmp.append(txt.encode(CODING))
-        print "{num:3} {subj:35} {grade:8} {task:65} {comment:30}".format(num=tmp[0], subj=tmp[1], task=tmp[2], grade=tmp[3], comment=tmp[4])
+        print "{num:3} {subj:35} {grade:8} {task:65} {comment:20}".format(num=tmp[0], subj=tmp[1], task=tmp[2], grade=tmp[3], comment=tmp[4])
         data_list.append(tmp)
     return data_list
 
@@ -223,11 +223,15 @@ def print_day_nextday():
 
 
 if __name__ == '__main__':
+
     soup = read_soup('thisWeek.html')
     today = datetime.now()
     day = today.strftime("%d.%m")
     lines = get_day(soup, day)
     dd = lines_to_dict(lines)
-    print dd
     write_json_to_file(dd) 
+    print_day(day, lines)
+
+    #print_day_nextday()
+
 
