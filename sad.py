@@ -77,13 +77,25 @@ def check_new_info(dict_cur, dict_prev):
         msg = ''
         for k in diff:
             msg += 'School %s\t: %s ---> %s\n' % (k, dict_prev[k], dict_cur[k])
-        print 'Oooops! Something changed'
-        print msg
-        helper.send_mail(emailUser, emailPassword, SENDER, RECIPIENT, SUBJ, msg)
+        somethingChanged(msg)
         helper.write_json_to_file(DATA_FILE, dict_cur)
+        print "Refreshing DATA_FILE........"
         return True
     else:
         return False
+
+
+@helper.print_line
+@helper.add_current_time
+def somethingChanged(msg_txt):
+    print "Oooops!!! Something new!"
+    print msg_txt
+    send_alert(msg_txt)
+
+
+def send_alert(msg):
+    print "Sending e-mail ........"
+    helper.send_mail(emailUser, emailPassword, SENDER, RECIPIENT, SUBJ, msg)
 
 
 @helper.print_line
