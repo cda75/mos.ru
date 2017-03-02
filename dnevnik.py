@@ -11,9 +11,9 @@ from selenium import webdriver
 # from selenium.webdriver.common.by import By
 # from selenium.webdriver.support.ui import WebDriverWait
 # from selenium.webdriver.support import expected_conditions as EC
-#from selenium.webdriver.support.select import Select
+# from selenium.webdriver.support.select import Select
 from ConfigParser import SafeConfigParser
-
+import os.path
 
 
 CONF_FILE = 'user.conf'
@@ -31,9 +31,9 @@ RECIPIENT = config.items('email', 'recipients')
 URL = config.get('diary', 'url')
 DATA_FILE = config.get('diary', 'data_file')
 
-OS = platform.system()
-isLinux = (OS == 'Linux')
-isWindows = (OS == 'Windows')
+# OS = platform.system()
+# isLinux = (OS == 'Linux')
+# isWindows = (OS == 'Windows')
 
 
 def format_time_dmY(func):
@@ -42,28 +42,54 @@ def format_time_dmY(func):
     return format
 
 
-def html2file(html, fName):
-    with open(fName, 'w') as f:
-        f.write(html.encode('utf-8'))
+def write_soup_to_file(soup):
+    with open(DATA_FILE, 'w') as f:
+        f.write(soup.encode('utf-8'))
 
 
-def read_soup(fName):
-    with open(fName) as f:
+def read_soup_from_file():
+    with open(DATA_FILE) as f:
         soup = BeautifulSoup(f.read(), 'html.parser')
     return soup
 
 
+def read_json_from_file():
+    with open(DATA_FILE) as f:
+        return json.load(f)
+
+
+def write_json_to_file(info):
+    with open(DATA_FILE, 'w') as f:
+        f.write(json.dumps(info))
+
+
+def send_mail(msg_txt):
+    msg = 'From: %s\nTo: %s\nSubject: %s\n\n%s' % (SENDER, RECIPIENT, SUBJ, msg_txt)
+    try:
+        server = smtplib.SMTP('smtp.gmail.com:587')
+        server.starttls()
+        server.login(emailUser, emailPassword)
+        server.sendmail(SENDER, RECIPIENT, msg)
+        print '[+] Email successfully sent'
+    except:
+        print "[-] Error sending email"
+    server.quit()
+
+
 def render_page():
     driver = webdriver.Firefox()
-    driver.get(URL)
     driver.implicitly_wait(10)
+    driver.get(URL)
+    sleep(3)
     driver.find_element_by_name("j_username").send_keys(mosUser)
     driver.find_element_by_name("j_password").send_keys(mosPassword)
-    driver.find_element_by_id('outerlogin_button').click()
-    sleep(8)
-    driver.find_element_by_id("button_next").click()
     sleep(5)
-    return driver
+    driver.find_element_by_id('outerlogin_button').click()
+    sleep(7)
+    driver.find_element_by_id("button_next").click()
+    sleep(7)
+    week = driver.find_element_by_class_name("b-diary-st__body")
+    return (driver, week.get_attribute('innerHTML'))
 
 
 def render_next_week():
@@ -75,12 +101,6 @@ def render_next_week():
             i.click()
             sleep(3)
             return driver
-
-
-def write_page_to_file(driver, fName):
-    html = driver.page_source
-    with open(fName, 'w') as f:
-        f.write(html.encode('utf-8'))
 
 
 def get_Monday():
@@ -109,7 +129,7 @@ def get_day(tag, day):
         tmp = div.find('span', class_='b-diary-date')
         date = tmp.get_text().encode('utf-8')
         if date == day:
-            return get_lines(div)
+            return [l for l in div.find_all('div', class_='b-dl-table__list') if l.contents[3].span.string]
     else:
         print 'Ooops! Block with date %s not found' % day
         return False
@@ -127,33 +147,23 @@ def get_next_day(tag):
 
 
 def get_next_week():
-    drv = render_next_week()
+    render_next_week()
     pass
 
 
 def get_lines(tag):
-    r = [l for l in tag.find_all('div', class_='b-dl-table__list') if l.contents[3].span.string]
-    return r
-
-
-def lines_to_dict(lines):
-    data_list = []
+# res = [l for l in tag.find_all('div', class_='b-dl-table__list') if l.contents[3].span.string]
+    res = []
+    lines = tag.find_all('div', class_='b-dl-table__list')
     for line in lines:
-        columns = line.find_all('div', class_='b-dl-td_column')
-        tmp = []
-        d = {}
-        for col in columns:
-            txt = col.find('span').text
-            tmp.append(txt)
-        d['num'], d['subj'], d['task'], d['grade'], d['comment'] = tmp
-        data_list.append(d)
-    return data_list
-
+        if line.contents[3].span.string:
+            res.append(line)
+    return res
 
 
 def print_day(day, lines):
     pattern = 'Иностранный'.decode('utf-8')
-    print '\n',day
+    print '\n', day
     data_list = []
     for line in lines:
         columns = line.find_all('div', class_='b-dl-td_column')
@@ -168,50 +178,10 @@ def print_day(day, lines):
     return data_list
 
 
-def check_grade(dict_cur, dict_prev):
-    diff = [k for k in dict_cur if dict_cur[k] != dict_prev[k]]
-    if diff:
-        msg = ''
-        for k in diff:
-            msg += 'School %s\t: %s ---> %s\n' % (k, dict_prev[k], dict_cur[k])
-        print strftime("%d-%m-%y %H:%M", localtime())
-        print 'Oooops! Something changed'
-        print msg
-        send_mail(msg)
-        write_json_to_file(dict_cur)
-        return True
-    else:
-        return False
-
-
-def read_json_from_file():
-    with open(DATA_FILE) as f:
-        return json.load(f)
-
-
-def write_json_to_file(info):
-    with open(DATA_FILE, 'w') as f:
-        f.write(json.dumps(info))
-
-
-def send_mail(subj, grade):
-    msg_txt = 'I have got a new grade %s on subject %s' % (grade, subj)
-    msg = 'From: %s\nTo: %s\nSubject: %s\n\n%s' % (SENDER, RECIPIENT, SUBJ, msg_txt)
-    try:
-        server = smtplib.SMTP('smtp.gmail.com:587')
-        server.starttls()
-        server.login(emailUser, emailPassword)
-        server.sendmail(SENDER, RECIPIENT, msg)
-        print '[+] Email successfully sent'
-    except:
-        print "[-] Error sending email"
-    server.quit()
-
-
 def print_day_nextday():
     drv = render_page()
-    write_page_to_file(drv, 'thisWeek.html')
-    soup = read_soup('thisWeek.html')
+    write_soup_to_file(drv)
+    soup = read_soup_from_file()
     today = datetime.now()
     day = today.strftime("%d.%m")
     lines = get_day(soup, day)
@@ -222,16 +192,55 @@ def print_day_nextday():
     drv.quit()
 
 
+def day_to_dict(week, day):
+    day_schedule = get_day(week, day)
+    data_list = []
+    for line in day_schedule:
+        columns = line.find_all('div', class_='b-dl-td_column')
+        tmp = []
+        d = {}
+        for col in columns:
+            txt = col.find('span').text
+            tmp.append(txt)
+        d['num'], d['subj'], d['task'], d['grade'], d['comment'] = tmp
+        data_list.append(d)
+    return data_list
+
+
+def check_day_grades(list_cur, list_prev):
+    diffs = []
+    for i in range(len(list_cur)):
+        subj = list_cur[i]['subj']
+        grade_cur = list_cur[i]['grade']
+        grade_prev = list_prev[i]['grade']
+        if grade_cur != grade_prev:
+            #print 'Oooops! Something changed'
+            diffs.append((subj, grade_cur))
+    return diffs
+
+
+def create_msg_from_diff(diffs):
+    msg = "\nI have got a new grade"
+    for diff in diffs:
+        subj = diff[0]
+        grade = diff[1]
+        msg += "%s\t:  %s\n" % (subj, grade)
+    return msg
+
+
 if __name__ == '__main__':
+    drv, html_current = render_page()
+    day = "02.03"
+    soup_current = BeautifulSoup(html_current, 'html.parser')
+    info_current = day_to_dict(soup_current, day)
 
-    soup = read_soup('thisWeek.html')
-    today = datetime.now()
-    day = today.strftime("%d.%m")
-    lines = get_day(soup, day)
-    dd = lines_to_dict(lines)
-    write_json_to_file(dd) 
-    print_day(day, lines)
+    if not os.path.isfile(DATA_FILE):
+        print 'File was absent - no previous info'
+        print 'Creating a new week file..........'
+        write_soup_to_file(soup_current)
+    soup_prev = read_soup_from_file()
+    info_prev = day_to_dict(soup_prev, day)
 
-    #print_day_nextday()
-
+    diff = check_day_grades(info_current, info_prev)
+    print create_msg_from_diff(diff)
 
