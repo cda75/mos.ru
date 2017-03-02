@@ -209,10 +209,13 @@ if __name__ == '__main__':
         write_soup_to_file(soup_current)
     soup_prev = read_soup_from_file()
     info_prev = day_to_dict(soup_prev, day)
-
+    if len(info_current) > len(info_prev):
+        info_prev.append(info_current[-1])
+        write_soup_to_file(soup_current)
     diff = check_day_grades(info_current, info_prev)
-    print 'diff =', diff
     if diff:
         msg = create_msg_from_diff(diff)
         helper.send_mail(emailUser, emailPassword, SENDER, RECIPIENT, SUBJ, msg)
+        write_soup_to_file(soup_current)
+
 

@@ -28,13 +28,13 @@ def write_json_to_file(fName, info):
         f.write(json.dumps(info))
 
 
-def send_mail(emailUser, emailPassword, SENDER, RECIPIENT, msg_txt):
-    msg = 'From: %s\nTo: %s\nSubject: %s\n\n%s' % (SENDER, RECIPIENT, SUBJ, msg_txt)
+def send_mail(emailUser, emailPassword, sender, recipient, subj, msg_txt):
+    msg = 'From: %s\nTo: %s\nSubject: %s\n\n%s' % (sender, recipient, subj, msg_txt)
     try:
         server = smtplib.SMTP('smtp.gmail.com:587')
         server.starttls()
         server.login(emailUser, emailPassword)
-        server.sendmail(SENDER, RECIPIENT, msg)
+        server.sendmail(sender, recipient, msg)
         print '[+] Email successfully sent'
     except:
         print "[-] Error sending email"
