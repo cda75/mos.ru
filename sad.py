@@ -28,6 +28,7 @@ FIO = config.get('sad', 'fio').decode('utf-8')
 SENDER = config.get('email', 'sender')
 SUBJ = config.get('email', 'subject')
 RECIPIENT = config.get('email', 'recipients')
+mail_header = (emailUser, emailPassword, SENDER, RECIPIENT, SUBJ)
 DATA_FILE = config.get('sad', 'data_file')
 
 
@@ -95,7 +96,7 @@ def somethingChanged(msg_txt):
 
 def send_alert(msg):
     print "Sending e-mail ........"
-    helper.send_mail(emailUser, emailPassword, SENDER, RECIPIENT, SUBJ, msg)
+    helper.send_mail(mail_header, msg)
 
 
 @helper.print_line
