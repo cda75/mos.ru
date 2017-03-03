@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from time import sleep
 import sys
 from bs4 import BeautifulSoup
 from datetime import datetime, timedelta
@@ -20,6 +19,7 @@ CODING = sys.stdout.encoding
 config = SafeConfigParser()
 config.read(CONF_FILE)
 
+mosURL = config.get('diary', 'url')
 mosUser = config.get('auth', 'user')
 mosPassword = config.get('auth', 'password')
 
@@ -30,7 +30,6 @@ SUBJ = config.get('email', 'subject')
 RECIPIENT = config.get('email', 'recipients')
 mail_header = (emailUser, emailPassword, SENDER, RECIPIENT, SUBJ)
 
-URL = config.get('diary', 'url')
 DATA_FILE = config.get('diary', 'data_file')
 
 
@@ -48,24 +47,22 @@ def format_time_dm(func):
 
 def render_page():
     driver = webdriver.Firefox()
-    driver.get(URL)
+    driver.get(mosURL)
     wait = WebDriverWait(driver, 15)
+    elem1 = "//a[@class='chosen-single']/span[.='K1617']"
+    elem2 = "//div[@class='b-diary-st__body']"
     driver.find_element_by_name("j_username").send_keys(mosUser)
     driver.find_element_by_name("j_password").send_keys(mosPassword)
     driver.find_element_by_id('outerlogin_button').click()
     try:
-        elem1 = "//a[@class='chosen-single']/span[.='K1617']"
         wait.until(EC.presence_of_element_located((By.XPATH, elem1)))
         driver.find_element_by_id("button_next").click()
-        elem2 = "//div[@class='b-diary-st__body']"
         diary = wait.until(EC.presence_of_element_located((By.XPATH, elem2)))
         html = diary.get_attribute('innerHTML')
         soup = BeautifulSoup(html, 'html.parser')
         return (driver, soup)
     except NoSuchElementException:
         print "Ooops! Element was not found probably because of timing issue"
-    finally:
-        sleep(1)
 
 
 def render_next_week():
@@ -75,7 +72,7 @@ def render_next_week():
     for i in select.find_elements_by_tag_name('option'):
         if i.text == nextMonday:
             i.click()
-            sleep(3)
+#            sleep(3)
             return driver
 
 
@@ -224,6 +221,8 @@ def check_day(day, soup_current):
     # Comparing current and previuos info
     diff = compare_grades(info_current, info_prev)
     if diff:
+        print "New grades were found. Rewriting a date_file."
+        helper.write_soup_to_file(DATA_FILE, soup_current)
         return diff
     return False
 
