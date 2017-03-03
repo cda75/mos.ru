@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import sys
 from bs4 import BeautifulSoup
 from datetime import datetime, timedelta
 from selenium import webdriver
@@ -14,8 +13,6 @@ import helper
 
 
 CONF_FILE = 'user.conf'
-CODING = sys.stdout.encoding
-
 config = SafeConfigParser()
 config.read(CONF_FILE)
 
@@ -66,6 +63,7 @@ def render_page():
 
 
 def render_next_week():
+    print CODING
     driver = render_page()
     nextMonday = get_next_Monday_dmY()
     select = driver.find_element_by_name("next")
@@ -139,7 +137,7 @@ def print_day(lines):
             txt = col.find('span').text
             if pattern in txt:
                 txt = 'Немецкий язык'.decode('utf-8')
-            tmp.append(txt.encode(CODING))
+            tmp.append(txt.encode('utf-8'))
         print "{num:3} {subj:32} {grade:6} {task:65} {comment:15}".format(num=tmp[0], subj=tmp[1], task=tmp[2], grade=tmp[3], comment=tmp[4])
         data_list.append(tmp)
     return data_list

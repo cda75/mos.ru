@@ -38,7 +38,7 @@ def render_page():
     driver.find_element_by_name("j_username").send_keys(mosUser)
     driver.find_element_by_name("j_password").send_keys(mosPassword)
     driver.find_element_by_id('outerlogin_button').click()
-    sleep(5)
+    sleep(8)
     driver.get(MAIN_URL)
     driver.implicitly_wait(15)
     XPATH1 = "//a[@href='/pgu/ru/application/dogm/77060101/#show_4']"
@@ -49,12 +49,12 @@ def render_page():
     sleep(7)
     XPATH3 = ".//*[@id='step_1']/div[3]/fieldset[1]/div/div[1]/div/div/ul/li[2]"
     driver.find_element_by_xpath(XPATH3).click()
-    # sleep(7)
+    sleep(5)
     RequestForm = "field[d.internal.RequestNumber]"
     driver.find_element_by_name(RequestForm).send_keys(RequestNumber)
     driver.find_element_by_id("D_surname").send_keys(FIO)
     driver.find_element_by_id('button_next').click()
-    sleep(8)
+    sleep(5)
     # element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "D_dou_info")))
     result = driver.find_element_by_id('D_dou_info')
     return (driver, result.get_attribute('innerHTML'))
