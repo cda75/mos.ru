@@ -5,10 +5,10 @@ import sys
 from bs4 import BeautifulSoup
 from datetime import datetime, timedelta
 from selenium import webdriver
-# from selenium.webdriver.common.by import By
-# from selenium.webdriver.support.ui import WebDriverWait
-# from selenium.webdriver.support import expected_conditions as EC
-# from selenium.webdriver.support.select import Select
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import NoSuchElementException
 from ConfigParser import SafeConfigParser
 import os.path
 import helper
@@ -48,19 +48,24 @@ def format_time_dm(func):
 
 def render_page():
     driver = webdriver.Firefox()
-    driver.implicitly_wait(10)
     driver.get(URL)
+    wait = WebDriverWait(driver, 15)
     driver.find_element_by_name("j_username").send_keys(mosUser)
     driver.find_element_by_name("j_password").send_keys(mosPassword)
-    sleep(3)
     driver.find_element_by_id('outerlogin_button').click()
-    sleep(10)
-    driver.find_element_by_id("button_next").click()
-    sleep(7)
-    week = driver.find_element_by_class_name("b-diary-st__body")
-    html = week.get_attribute('innerHTML')
-    soup = BeautifulSoup(html, 'html.parser')
-    return (driver, soup)
+    try:
+        elem1 = "//a[@class='chosen-single']/span[.='K1617']"
+        wait.until(EC.presence_of_element_located((By.XPATH, elem1)))
+        driver.find_element_by_id("button_next").click()
+        elem2 = "//div[@class='b-diary-st__body']"
+        diary = wait.until(EC.presence_of_element_located((By.XPATH, elem2)))
+        html = diary.get_attribute('innerHTML')
+        soup = BeautifulSoup(html, 'html.parser')
+        return (driver, soup)
+    except NoSuchElementException:
+        print "Ooops! Element was not found probably because of timing issue"
+    finally:
+        sleep(1)
 
 
 def render_next_week():
@@ -179,11 +184,9 @@ def compare_grades(list_cur, list_prev):
 @helper.print_line
 @helper.add_current_time
 def send_alert(diffs):
-    msg = "I have got a new grade\n"
+    msg = "\n"
     for diff in diffs:
-        subj = diff[0]
-        grade = diff[1]
-        msg += "%s\t\t:  %s\n" % (subj, grade)
+        msg += "%s\t\t%s\n" % (diff[0], diff[1])
     print "Sending e-mail .........."
     helper.send_mail(mail_header, msg.encode('utf-8'))
     return True
@@ -228,8 +231,9 @@ def check_day(day, soup_current):
 if __name__ == '__main__':
     day = get_current_day()
     drv, soup = render_page()
-    if not send_alert(check_day(day, soup)):
+    newGrade = check_day(day, soup)
+    if newGrade:
+        send_alert(newGrade)
+    else:
         nothing_New(day, soup)
     drv.quit()
-
-
