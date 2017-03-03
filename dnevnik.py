@@ -12,7 +12,6 @@ from selenium import webdriver
 from ConfigParser import SafeConfigParser
 import os.path
 import helper
-import unicodedata
 
 
 CONF_FILE = 'user.conf'
