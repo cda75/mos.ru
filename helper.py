@@ -21,9 +21,9 @@ class TimeTable(object):
     mosURL = 'https://pgu.mos.ru/ru/application/dogm/journal/#step_1'
     CODING = stdout.encoding
 
-    def __init__(self, week='', mosUser='', mosPassword=''):
-        self.__mosUser = mosUser
-        self.__mosPassword = mosPassword
+    def __init__(self, week='', user='', password=''):
+        self.__mosUser = user
+        self.__mosPassword = password
         self.weekData = {}
         self.set_week(week)
         if os.path.isfile(self.weekFile):

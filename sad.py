@@ -7,18 +7,15 @@ import re
 from ConfigParser import SafeConfigParser
 import os.path
 import helper
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
+# from selenium.webdriver.common.by import By
+# from selenium.webdriver.support.ui import WebDriverWait
+# from selenium.webdriver.support import expected_conditions as EC
 # from selenium.common.exceptions import TimeoutException
 
 
-MAIN_URL = 'https://www.mos.ru/pgu/ru/services/link/1742/'
-# AUTH_URL = 'https://www.mos.ru/api/oauth20/v1/frontend/json/ru/process/enter?redirect=https://www.mos.ru'
+MAIN_URL = 'https://www.mos.ru/pgu/ru/services/link/1742/?utm_source=mos&utm_medium=ek&utm_referrer=mos.ru&utm_campaign=popular&utm_term=733533'
+AUTH_URL = 'https://www.mos.ru/api/oauth20/v1/frontend/json/ru/process/enter?redirect=https://www.mos.ru'
 CONF_FILE = 'user.conf'
-AUTH_URL = 'https://www.mos.ru/api/oauth20/v1/frontend/json/ru/process/enter?'
-SAD_URL = 'https://www.mos.ru/pgu/ru/application/dogm/77060101/'
-
 
 config = SafeConfigParser()
 config.read(CONF_FILE)
@@ -38,55 +35,27 @@ DATA_FILE = config.get('sad', 'data_file')
 def render_page():
     driver = webdriver.Firefox()
     driver.get(AUTH_URL)
-    wait = WebDriverWait(driver, 15)
-    XPATH1 = "//a[@href='/pgu/ru/application/dogm/77060101/#show_4']"
-    XPATH2 = ".//*[@id='step_1']/div[3]/fieldset[1]/div/div[1]/div"
-    XPATH3 = ".//*[@id='step_1']/div[3]/fieldset[1]/div/div[1]/div/div/ul/li[2]"
     driver.find_element_by_name("j_username").send_keys(mosUser)
     driver.find_element_by_name("j_password").send_keys(mosPassword)
     driver.find_element_by_id('outerlogin_button').click()
-<<<<<<< HEAD
-<<<<<<< HEAD
-    sleep(15)
-=======
-=======
-    sleep(8)
+    sleep(10)
     driver.get(MAIN_URL)
     driver.implicitly_wait(15)
     XPATH1 = "//a[@href='/pgu/ru/application/dogm/77060101/#show_4']"
     driver.find_element_by_xpath(XPATH1).click()
->>>>>>> 9aa93a96d0397d7457f4c1a7cc8e14504ae0275b
-    sleep(8)
->>>>>>> 9aa93a96d0397d7457f4c1a7cc8e14504ae0275b
-    driver.get(MAIN_URL)
-    wait.until(EC.presence_of_element_located((By.XPATH, XPATH1))).click()
-    # driver.find_element_by_xpath(XPATH1).click()
-    # sleep(8)
-    wait.until(EC.presence_of_element_located((By.XPATH, XPATH2)))
+    sleep(10)
+    XPATH2 = ".//*[@id='step_1']/div[3]/fieldset[1]/div/div[1]/div"
     driver.find_element_by_xpath(XPATH2).click()
-<<<<<<< HEAD
-    # sleep(7)
-    wait.until(EC.presence_of_element_located((By.XPATH, XPATH3)))
-=======
-    sleep(7)
+    sleep(10)
     XPATH3 = ".//*[@id='step_1']/div[3]/fieldset[1]/div/div[1]/div/div/ul/li[2]"
->>>>>>> 9aa93a96d0397d7457f4c1a7cc8e14504ae0275b
     driver.find_element_by_xpath(XPATH3).click()
-    sleep(5)
+    sleep(8)
     RequestForm = "field[d.internal.RequestNumber]"
     driver.find_element_by_name(RequestForm).send_keys(RequestNumber)
     driver.find_element_by_id("D_surname").send_keys(FIO)
     driver.find_element_by_id('button_next').click()
-<<<<<<< HEAD
-<<<<<<< HEAD
-    # sleep(8)
-    wait.until(EC.presence_of_element_located((By.ID, "D_dou_info")))
-=======
-=======
->>>>>>> 9aa93a96d0397d7457f4c1a7cc8e14504ae0275b
     sleep(5)
     # element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "D_dou_info")))
->>>>>>> 9aa93a96d0397d7457f4c1a7cc8e14504ae0275b
     result = driver.find_element_by_id('D_dou_info')
     return (driver, result.get_attribute('innerHTML'))
 

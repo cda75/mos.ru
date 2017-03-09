@@ -23,10 +23,8 @@ DATA_FILE = config.get('diary', 'data_file')
 
 
 if __name__ == '__main__':
-    T = TimeTable(mosUser=mosUser, mosPassword=mosPassword)
-    T.print_day()
+    T = TimeTable(user=mosUser, password=mosPassword)
     T.print_day('next')
-    
 
 
 
