@@ -46,8 +46,16 @@ def render_page():
     driver.find_element_by_name("j_password").send_keys(mosPassword)
     driver.find_element_by_id('outerlogin_button').click()
 <<<<<<< HEAD
+<<<<<<< HEAD
     sleep(15)
 =======
+=======
+    sleep(8)
+    driver.get(MAIN_URL)
+    driver.implicitly_wait(15)
+    XPATH1 = "//a[@href='/pgu/ru/application/dogm/77060101/#show_4']"
+    driver.find_element_by_xpath(XPATH1).click()
+>>>>>>> 9aa93a96d0397d7457f4c1a7cc8e14504ae0275b
     sleep(8)
 >>>>>>> 9aa93a96d0397d7457f4c1a7cc8e14504ae0275b
     driver.get(MAIN_URL)
@@ -56,8 +64,13 @@ def render_page():
     # sleep(8)
     wait.until(EC.presence_of_element_located((By.XPATH, XPATH2)))
     driver.find_element_by_xpath(XPATH2).click()
+<<<<<<< HEAD
     # sleep(7)
     wait.until(EC.presence_of_element_located((By.XPATH, XPATH3)))
+=======
+    sleep(7)
+    XPATH3 = ".//*[@id='step_1']/div[3]/fieldset[1]/div/div[1]/div/div/ul/li[2]"
+>>>>>>> 9aa93a96d0397d7457f4c1a7cc8e14504ae0275b
     driver.find_element_by_xpath(XPATH3).click()
     sleep(5)
     RequestForm = "field[d.internal.RequestNumber]"
@@ -65,9 +78,12 @@ def render_page():
     driver.find_element_by_id("D_surname").send_keys(FIO)
     driver.find_element_by_id('button_next').click()
 <<<<<<< HEAD
+<<<<<<< HEAD
     # sleep(8)
     wait.until(EC.presence_of_element_located((By.ID, "D_dou_info")))
 =======
+=======
+>>>>>>> 9aa93a96d0397d7457f4c1a7cc8e14504ae0275b
     sleep(5)
     # element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "D_dou_info")))
 >>>>>>> 9aa93a96d0397d7457f4c1a7cc8e14504ae0275b
