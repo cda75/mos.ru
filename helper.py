@@ -53,6 +53,14 @@ class TimeTable(object):
         self.weekFile = weekStart.strftime("%d-%m-%y") + '.data'
         self.tomorrow = (today + timedelta(1)).strftime("%d.%m")
         self.yestarday = (today - timedelta(1)).strftime("%d.%m")
+        self.weekDays = self.__get_weekDays(weekStart)
+
+    def __get_weekDays(self, weekStart):
+        week = [weekStart.strftime("%d.%m")]
+        for i in range(5):
+            weekStart += timedelta(1)
+            week.append(weekStart.strftime("%d.%m"))
+        return week
 
     def set_day(self, day):
         self.day = day
@@ -135,7 +143,7 @@ class TimeTable(object):
             day = self.tomorrow
         elif day == 'yestarday' or day == 'prev':
             day = self.yestarday
-        elif not day:
+        elif day == 'today' or day == None:
             day = self.today
         lines = self.__get_day(day)
         print "-----------------------------------"
@@ -153,6 +161,8 @@ class TimeTable(object):
         return data_list
 
     def print_week(self, week=None):
+        for day in self.weekDays:
+            self.print_day(day)
         pass
 
     def __compare_grades(self, list_cur, list_prev):
@@ -179,7 +189,7 @@ class TimeTable(object):
             data_list.append(d)
         return data_list
 
-    def check_dayGrade(self, day=None):
+    def check_day(self, day=None):
         if not day:
             day = self.today
         # Read info from previous try
