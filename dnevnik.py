@@ -31,7 +31,9 @@ if __name__ == '__main__':
     action = args.action
     day = args.date
     T = TimeTable(user=mosUser, password=mosPassword)
-    if action == 'check':
+    if day == 'week':
+        T.print_week()
+    elif action == 'check':
         T.check_day(day)
     else:
         T.print_day(day)
