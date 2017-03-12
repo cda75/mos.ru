@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from helper import TimeTable
+from helper import TimeTable, send_mail
 from ConfigParser import SafeConfigParser
+from argparse import ArgumentParser
 
 
 CONF_FILE = 'user.conf'
@@ -21,22 +22,23 @@ mail_header = (emailUser, emailPassword, SENDER, RECIPIENT, SUBJ)
 
 DATA_FILE = config.get('diary', 'data_file')
 
+    
+parser = ArgumentParser(description='CLI for Electronic Diary at mos.ru')
+parser.add_argument("-action", type=str, dest='action', default='print', help='Type of action: check or print')
+parser.add_argument("-date", type=str, dest='date', default='today', help='Time-day for action: dd.mm format')
+args = parser.parse_args()
+action = args.action
+day = args.date
+T = TimeTable(user=mosUser, password=mosPassword)
+if day == 'week':
+    T.print_week()
+elif action == 'check':
+    check = T.check_day(day)
+else:
+    T.print_day(day)
 
-if __name__ == '__main__':
-    import argparse
-    parser = argparse.ArgumentParser(description='CLI for Electronic Diary at mos.ru')
-    parser.add_argument("-action", type=str, dest='action', default='print', help='Type of action: check or print')
-    parser.add_argument("-date", type=str, dest='date', default='today', help='Time-day for action: dd.mm format')
-    args = parser.parse_args()
-    action = args.action
-    day = args.date
-    T = TimeTable(user=mosUser, password=mosPassword)
-    if day == 'week':
-        T.print_week()
-    elif action == 'check':
-        T.check_day(day)
-    else:
-        T.print_day(day)
+if check:
+    send_mail(mail_header, 'test')
 
 
 
