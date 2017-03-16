@@ -14,19 +14,27 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException, TimeoutException
 from datetime import datetime, timedelta
+from ConfigParser import SafeConfigParser 
 
 
 # Main Class description
 class TimeTable(object):
     mosURL = 'https://pgu.mos.ru/ru/application/dogm/journal/#step_1'
     CODING = stdout.encoding
-    diaryName = 'K1617'
 
-    def __init__(self, week='', user='', password=''):
-        self.__mosUser = user
-        self.__mosPassword = password
+    def __init__(self, conf='user.conf'):
+        self.__CONF_FILE = conf
+        config = SafeConfigParser()
+        config.read(self.__CONF_FILE)
+        self.__mosUser = config.get('auth', 'user')
+        self.__mosPassword = config.get('auth', 'password')
+        self.dataDir = config.get('diary', 'data_dir')
+        self.diaryName = config.get('diary', 'diary_name')
+        if not os.path.exists(self.dataDir):
+            os.makedirs(self.dataDir)
+        os.chdir(self.dataDir)
         self.weekData = {}
-        self.set_week(week)
+        self.set_week()
         if os.path.isfile(self.weekFile):
             self.weekSoup = self.__read_week_from_file()
             if len(self.weekSoup) == 0:
@@ -144,8 +152,10 @@ class TimeTable(object):
             day = self.tomorrow
         elif day == 'yestarday' or day == 'prev':
             day = self.yestarday
-        elif day == 'today' or day is None:
+        elif day == 'today' or not day:
             day = self.today
+            print 'xz'
+        print day
         lines = self.__get_day(day)
         print "-----------------------------------"
         print day, ':'
@@ -215,6 +225,15 @@ class TimeTable(object):
             return diff
         print "No new grades"
         self.print_day(day)
+
+    def main(self, action, date):
+        if date == 'week':
+            self.print_week()
+        elif action == 'check':
+            self.check_day(date)
+        else:
+            self.print_day(date)
+
 
 
 
