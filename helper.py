@@ -20,6 +20,7 @@ from datetime import datetime, timedelta
 class TimeTable(object):
     mosURL = 'https://pgu.mos.ru/ru/application/dogm/journal/#step_1'
     CODING = stdout.encoding
+    diaryName = 'K1617'
 
     def __init__(self, week='', user='', password=''):
         self.__mosUser = user
@@ -29,16 +30,16 @@ class TimeTable(object):
         if os.path.isfile(self.weekFile):
             self.weekSoup = self.__read_week_from_file()
             if len(self.weekSoup) == 0:
-                print '[-] File is empty, running page scruup'
-                self.start()
-                self.__save_week_to_file()
-                self.stop()
+                print '[-] Week File is empty! Running new page grabbing process'
+                self.__check_week()
         else:
-            print "[-] Week File is absent!"
-            print "[i] Start writing new week file"
-            self.start()
-            self.__save_week_to_file()
-            self.stop()
+            print "[-] Week File is absent! Start writing a new week file"
+            self.__check_week()
+
+    def __check_week(self):
+        self.start()
+        self.__save_week_to_file()
+        self.stop()
 
     def set_week(self, week=None):
         today = datetime.now()
@@ -70,7 +71,7 @@ class TimeTable(object):
         driver = webdriver.Firefox()
         driver.get(self.mosURL)
         wait = WebDriverWait(driver, 15)
-        elem1 = "//a[@class='chosen-single']/span[.='K1617']"
+        elem1 = "//a[@class='chosen-single']/span[.='{}']".format(self.diaryName)
         elem2 = "//div[@class='b-diary-st__body']"
         driver.find_element_by_name("j_username").send_keys(self.__mosUser)
         driver.find_element_by_name("j_password").send_keys(self.__mosPassword)
@@ -143,7 +144,7 @@ class TimeTable(object):
             day = self.tomorrow
         elif day == 'yestarday' or day == 'prev':
             day = self.yestarday
-        elif day == 'today' or day == None:
+        elif day == 'today' or day is None:
             day = self.today
         lines = self.__get_day(day)
         print "-----------------------------------"
@@ -190,7 +191,7 @@ class TimeTable(object):
         return data_list
 
     def check_day(self, day=None):
-        if not day:
+        if not day or day == 'today':
             day = self.today
         # Read info from previous try
         soup_prev = self.weekSoup
@@ -231,26 +232,6 @@ def add_current_time(func):
         return func(*args, **kwargs)
     return wrapper
 
-
-# File operaitions
-def read_json_from_file(fName):
-    with open(fName) as f:
-        return json.load(f)
-
-
-def write_json_to_file(fName, info):
-    with open(fName, 'w') as f:
-        f.write(json.dumps(info))
-
-
-def write_soup_to_file(fName, soup):
-    with open(fName, 'w') as f:
-        f.write(soup.encode('utf-8'))
-
-
-def read_soup_from_file(fName):
-    with open(fName) as f:
-        return BeautifulSoup(f.read(), 'html.parser')
 
 
 # E-mail sender

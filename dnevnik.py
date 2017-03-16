@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from helper import TimeTable, send_mail
+from helper import TimeTable
 from ConfigParser import SafeConfigParser
 from argparse import ArgumentParser
 
@@ -9,18 +9,17 @@ CONF_FILE = 'user.conf'
 config = SafeConfigParser()
 config.read(CONF_FILE)
 
-mosURL = config.get('diary', 'url')
+# mosURL = config.get('diary', 'url')
 mosUser = config.get('auth', 'user')
 mosPassword = config.get('auth', 'password')
 
-emailUser = config.get('email', 'user')
-emailPassword = config.get('email', 'password')
-SENDER = config.get('email', 'sender')
-SUBJ = config.get('email', 'subject')
-RECIPIENT = config.get('email', 'recipients')
-mail_header = (emailUser, emailPassword, SENDER, RECIPIENT, SUBJ)
-
-DATA_FILE = config.get('diary', 'data_file')
+# emailUser = config.get('email', 'user')
+# emailPassword = config.get('email', 'password')
+# SENDER = config.get('email', 'sender')
+# SUBJ = config.get('email', 'subject')
+# RECIPIENT = config.get('email', 'recipients')
+# mail_header = (emailUser, emailPassword, SENDER, RECIPIENT, SUBJ)
+# DATA_FILE = config.get('diary', 'data_file')
 
     
 parser = ArgumentParser(description='CLI for Electronic Diary at mos.ru')
@@ -34,11 +33,8 @@ if day == 'week':
     T.print_week()
 elif action == 'check':
     check = T.check_day(day)
-else:
+elif action == 'print':
     T.print_day(day)
-
-if check:
-    send_mail(mail_header, 'test')
 
 
 
