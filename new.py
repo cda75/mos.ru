@@ -8,6 +8,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException, TimeoutException
 from selenium.webdriver.common.by import By
 import sqlite3 as sql
+import re
 
 
 
@@ -22,6 +23,20 @@ def read_week_from_file(fname):
     	return BeautifulSoup(f.read(), 'html.parser')
 
 
+def get_task_by_day(day):
+	con = sql.connect("mosru.db")
+	con.text_factory = str
+	cursor = con.cursor()
+	cursor.execute("SELECT subject,description FROM dnevnik WHERE d_to=?", (day,))
+	rows = cursor.fetchall()
+	print
+	for row in rows:
+		for i in row:
+			print i.decode('cp1251'),'\t\t',
+		print 
+	con.close()
+
+'''
 mainURL = 'https://www.mos.ru'
 diaryURL = 'https://www.mos.ru/pgu/ru/application/dogm/journal/'
 loginURL = 'https://www.mos.ru/api/oauth20/v1/frontend/json/ru/process/enter?redirect=https%3A%2F%2Fwww.mos.ru%2F'
@@ -71,18 +86,16 @@ for t in task_list:
 	subj = t[2].encode('cp1251')
 	req = ' '
 	descr = t[4].encode('cp1251')
+	descr = re.sub('Описание ДЗ'.decode('utf-8').encode('cp1251'),'',descr)
 	dur = t[5].encode('cp1251')
 	comm = ' '
 	cursor.execute("INSERT OR IGNORE INTO dnevnik VALUES (?,?,?,?,?,?,?);", (df,dt,subj,req,descr,dur,comm))
 	con.commit()
 
+'''
 
-cursor.execute("SELECT * FROM dnevnik")
-rows = cursor.fetchall()
-for row in rows:
-	print row
-	
-con.close()
+get_task_by_day('25.10.2017')
+
 #driver.close()
 
 
