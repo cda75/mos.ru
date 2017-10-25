@@ -76,8 +76,14 @@ for t in task_list:
 	cursor.execute("INSERT OR IGNORE INTO dnevnik VALUES (?,?,?,?,?,?,?);", (df,dt,subj,req,descr,dur,comm))
 	con.commit()
 
+
+cursor.execute("SELECT * FROM dnevnik")
+rows = cursor.fetchall()
+for row in rows:
+	print row
+	
 con.close()
-driver.close()
+#driver.close()
 
 
 
