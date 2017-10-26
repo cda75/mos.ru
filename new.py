@@ -85,7 +85,7 @@ def writeDB(task):
 	con.text_factory = str
 	cursor = con.cursor()
 	badString = 'Описание ДЗ'.decode('utf8')
-	print "Writing date to DataBase.....\n"
+	print "Writing information to DataBase.....\n"
 	for t in task:
 		df = t[0].encode('cp1251')
 		dt = t[1].encode('cp1251')
