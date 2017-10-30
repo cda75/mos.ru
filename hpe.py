@@ -36,7 +36,6 @@ URLs = {
 		}
 
 
-
 parser = ArgumentParser(description='CLI for automating HPE PPA actions')
 parser.add_argument("-action", type=str, dest='action', default='spec', help='Type of action: cert, spec, deal, rebate, user, status')
 args = parser.parse_args()

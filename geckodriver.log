@@ -1,105 +1,94 @@
-1508935785625	geckodriver	INFO	geckodriver 0.19.0
-1508935785633	geckodriver	INFO	Listening on 127.0.0.1:50900
-1508935787706	mozrunner::runner	INFO	Running command: "C:\\Program Files\\Mozilla Firefox\\firefox.exe" "-marionette" "-profile" "C:\\Users\\Dmitry\\AppData\\Local\\Temp\\rust_mozprofile.rQJNKeD0I8Hd"
-1508935787982	addons.xpi	WARN	Error parsing extensions state: [Exception... "Component returned failure code: 0x80520012 (NS_ERROR_FILE_NOT_FOUND) [amIAddonManagerStartup.readStartupData]"  nsresult: "0x80520012 (NS_ERROR_FILE_NOT_FOUND)"  location: "JS frame :: resource://gre/modules/addons/XPIProvider.jsm :: loadExtensionState :: line 1554"  data: no] Stack trace: loadExtensionState()@resource://gre/modules/addons/XPIProvider.jsm:1554 < getInstallState()@resource://gre/modules/addons/XPIProvider.jsm:1589 < checkForChanges()@resource://gre/modules/addons/XPIProvider.jsm:3109 < startup()@resource://gre/modules/addons/XPIProvider.jsm:2188 < callProvider()@resource://gre/modules/AddonManager.jsm:269 < _startProvider()@resource://gre/modules/AddonManager.jsm:739 < startup()@resource://gre/modules/AddonManager.jsm:906 < startup()@resource://gre/modules/AddonManager.jsm:3090 < observe()@jar:file:///C:/Program%20Files/Mozilla%20Firefox/omni.ja!/components/addonManager.js:65
-1508935788540	Marionette	INFO	Enabled via --marionette
+1509374968680	geckodriver	INFO	geckodriver 0.19.0
+1509374968688	geckodriver	INFO	Listening on 127.0.0.1:60656
+1509374970779	mozrunner::runner	INFO	Running command: "C:\\Program Files\\Mozilla Firefox\\firefox.exe" "-marionette" "-profile" "C:\\Users\\Dmitry\\AppData\\Local\\Temp\\rust_mozprofile.Nl4w09X596b4"
+1509374971103	addons.xpi	WARN	Error parsing extensions state: [Exception... "Component returned failure code: 0x80520012 (NS_ERROR_FILE_NOT_FOUND) [amIAddonManagerStartup.readStartupData]"  nsresult: "0x80520012 (NS_ERROR_FILE_NOT_FOUND)"  location: "JS frame :: resource://gre/modules/addons/XPIProvider.jsm :: loadExtensionState :: line 1554"  data: no] Stack trace: loadExtensionState()@resource://gre/modules/addons/XPIProvider.jsm:1554 < getInstallState()@resource://gre/modules/addons/XPIProvider.jsm:1589 < checkForChanges()@resource://gre/modules/addons/XPIProvider.jsm:3109 < startup()@resource://gre/modules/addons/XPIProvider.jsm:2188 < callProvider()@resource://gre/modules/AddonManager.jsm:269 < _startProvider()@resource://gre/modules/AddonManager.jsm:739 < startup()@resource://gre/modules/AddonManager.jsm:906 < startup()@resource://gre/modules/AddonManager.jsm:3090 < observe()@jar:file:///C:/Program%20Files/Mozilla%20Firefox/omni.ja!/components/addonManager.js:65
+1509374971748	Marionette	INFO	Enabled via --marionette
 Unable to read VR Path Registry from C:\Users\Dmitry\AppData\Local\openvr\openvrpaths.vrpath
-[Child 1728] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
-[Child 1728] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
-1508935790518	Marionette	INFO	Listening on port 50906
-1508935790829	Marionette	WARN	TLS certificate errors will be ignored for this session
-1508935790882	Marionette	DEBUG	Register listener.js for window 4294967297
-1508935790921	Marionette	DEBUG	Received DOM event "beforeunload" for "about:blank"
-1508935791457	Marionette	DEBUG	Received DOM event "pagehide" for "about:blank"
-1508935791458	Marionette	DEBUG	Received DOM event "unload" for "about:blank"
+[Parent 10428] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\Dmitry\AppData\Local\openvr\openvrpaths.vrpath
+[Child 11260] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 11260] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+1509374973762	Marionette	INFO	Listening on port 60662
+1509374974224	Marionette	WARN	TLS certificate errors will be ignored for this session
+1509374974278	Marionette	DEBUG	Register listener.js for window 4294967297
+1509374974325	Marionette	DEBUG	Received DOM event "beforeunload" for "about:blank"
+1509374974963	Marionette	DEBUG	Received DOM event "pagehide" for "about:blank"
+1509374974963	Marionette	DEBUG	Received DOM event "unload" for "about:blank"
 Unable to read VR Path Registry from C:\Users\Dmitry\AppData\Local\openvr\openvrpaths.vrpath
 JavaScript warning: https://oauth20.mos.ru/js/certnew.js, line 797: unreachable code after return statement
-1508935792480	Marionette	DEBUG	Received DOM event "DOMContentLoaded" for "https://oauth20.mos.ru/sps/login.jsp"
-1508935793847	Marionette	DEBUG	Received DOM event "pageshow" for "https://oauth20.mos.ru/sps/login.jsp"
-1508935794096	Marionette	DEBUG	Received DOM event "beforeunload" for "https://oauth20.mos.ru/sps/login.jsp"
-1508935794433	Marionette	DEBUG	Received DOM event "pagehide" for "https://oauth20.mos.ru/sps/login.jsp"
-1508935794434	Marionette	DEBUG	Received DOM event "unload" for "https://oauth20.mos.ru/sps/login.jsp"
+1509374976358	Marionette	DEBUG	Received DOM event "DOMContentLoaded" for "https://oauth20.mos.ru/sps/login.jsp"
+1509374977051	Marionette	DEBUG	Received DOM event "pageshow" for "https://oauth20.mos.ru/sps/login.jsp"
+1509374977339	Marionette	DEBUG	Received DOM event "beforeunload" for "https://oauth20.mos.ru/sps/login.jsp"
+1509374977645	Marionette	DEBUG	Received DOM event "pagehide" for "https://oauth20.mos.ru/sps/login.jsp"
+1509374977646	Marionette	DEBUG	Received DOM event "unload" for "https://oauth20.mos.ru/sps/login.jsp"
 JavaScript warning: https://www.mos.ru/static/js/libs2.js?RMD-1213.0, line 5588: unreachable code after return statement
-1508935795289	Marionette	DEBUG	Received DOM event "DOMContentLoaded" for "https://www.mos.ru/"
-JavaScript error: https://ads.adfox.ru/255877/prepareCode?bid=&dl=https%3A%2F%2Fwww.mos.ru%2F&pd=25&pdh=1080&pdw=1920&pr1=4068511298&pr=3799380282&prr=https%3A%2F%2Foauth20.mos.ru%2Fsps%2Flogin.jsp&pv=15&pw=3&skipToken=&adSessionId=&layoutConfig=%7B%22win_width%22%3A1268%2C%22win_height%22%3A881%2C%22width%22%3A1251%2C%22height%22%3A0%2C%22left%22%3A0%2C%22top%22%3A94%2C%22visible%22%3A1%2C%22req_no%22%3A0%7D&ylv=0.530&ybv=0.530&extid_loader=MTUwODkzNTc5MzM4MTM3ODg2Mg%3D%3D&extid_tag_loader=www.mos.ru&ytt=5&p1=bxgae&p2=y&utf8=%E2%9C%93&grab=dNCe0YTQuNGG0LjQsNC70YzQvdGL0Lkg0YHQsNC50YIg0JzRjdGA0LAg0JzQvtGB0LrQstGLCjPQo9GB0LvRg9Cz0Lgg0Lgg0YHQtdGA0LLQuNGB0YsgCg%3D%3D, line 2: NS_ERROR_NOT_INITIALIZED: 
-1508935797078	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967302"
-1508935798228	Marionette	DEBUG	Received DOM event "pageshow" for "https://www.mos.ru/"
-1508935798269	Marionette	DEBUG	Received DOM event "beforeunload" for "https://www.mos.ru/"
-1508935799512	Marionette	DEBUG	Received DOM event "pagehide" for "https://www.mos.ru/"
-1508935799512	Marionette	DEBUG	Received DOM event "unload" for "https://www.mos.ru/"
-1508935800463	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967314"
-1508935800464	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967305"
-1508935800464	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967316"
-1508935800465	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967307"
-1508935800465	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967319"
-1508935800466	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967309"
-1508935800466	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967323"
-1508935800991	Marionette	DEBUG	Received DOM event "DOMContentLoaded" for "https://dnevnik.mos.ru/?token=7a6dd685521203ebdba8a7faaaa9f989"
-1508935801214	Marionette	DEBUG	Received DOM event "pageshow" for "https://dnevnik.mos.ru/?token=7a6dd685521203ebdba8a7faaaa9f989"
-1508935802401	Marionette	DEBUG	Received DOM event "DOMContentLoaded" for "https://dnevnik.mos.ru/desktop"
-1508935803584	Marionette	DEBUG	Received DOM event "pageshow" for "https://dnevnik.mos.ru/desktop"
-1508935803609	Marionette	DEBUG	Received DOM event "beforeunload" for "https://dnevnik.mos.ru/desktop"
-1508935803841	Marionette	DEBUG	Received DOM event "pagehide" for "https://dnevnik.mos.ru/desktop"
-1508935803841	Marionette	DEBUG	Received DOM event "unload" for "https://dnevnik.mos.ru/desktop"
-1508935805322	Marionette	DEBUG	Received DOM event "DOMContentLoaded" for "https://dnevnik.mos.ru/manage/student_homeworks"
-1508935806733	Marionette	DEBUG	Received DOM event "pageshow" for "https://dnevnik.mos.ru/manage/student_homeworks"
-t/element.js:267:17
-evalFn@chrome://marionette/content/wait.js:90:7
-
-*************************
-*************************
-A coding exception was thrown and uncaught in a Task.
-
-Full message: TypeError: can't access dead object
-Full stack: find_@chrome://marionette/content/element.js:302:7
-element.find/</findElements<@chrome://marionette/content/element.js:267:17
-evalFn@chrome://marionette/content/wait.js:90:7
-
-*************************
-Marionette threw an error: [Exception... "Component returned failure code: 0x80070057 (NS_ERROR_ILLEGAL_VALUE) [nsIMessageSender.sendAsyncMessage]"  nsresult: "0x80070057 (NS_ERROR_ILLEGAL_VALUE)"  location: "JS frame :: chrome://marionette/content/proxy.js :: sendReply_ :: line 273"  data: no]
-sendReply_@chrome://marionette/content/proxy.js:273:5
-reply@chrome://marionette/content/proxy.js:253:7
-sendToServer@chrome://marionette/content/listener.js:730:3
-sendError@chrome://marionette/content/listener.js:764:3
-dispatch/</<@chrome://marionette/content/listener.js:530:40
-
+1509374978564	Marionette	DEBUG	Received DOM event "DOMContentLoaded" for "https://www.mos.ru/"
+JavaScript error: https://ads.adfox.ru/255877/prepareCode?bid=&dl=https%3A%2F%2Fwww.mos.ru%2F&pd=30&pdh=1080&pdw=1920&pr1=4049009783&pr=829606752&prr=https%3A%2F%2Foauth20.mos.ru%2Fsps%2Flogin.jsp&pv=17&pw=1&skipToken=&adSessionId=&layoutConfig=%7B%22win_width%22%3A1268%2C%22win_height%22%3A881%2C%22width%22%3A1251%2C%22height%22%3A0%2C%22left%22%3A0%2C%22top%22%3A94%2C%22visible%22%3A1%2C%22req_no%22%3A0%7D&ylv=0.537&ybv=0.537&extid_loader=MTUwOTM3NDk3NjEwMTI4OTUwNDg%3D&extid_tag_loader=www.mos.ru&ytt=5&p1=bxgae&p2=y&utf8=%E2%9C%93&grab=dNCe0YTQuNGG0LjQsNC70YzQvdGL0Lkg0YHQsNC50YIg0JzRjdGA0LAg0JzQvtGB0LrQstGLCjPQo9GB0LvRg9Cz0Lgg0Lgg0YHQtdGA0LLQuNGB0YsgCg%3D%3D, line 2: NS_ERROR_NOT_INITIALIZED: 
+1509374980008	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967302"
+1509374990685	Marionette	DEBUG	Received DOM event "pageshow" for "https://www.mos.ru/"
+1509374990728	Marionette	DEBUG	Received DOM event "beforeunload" for "https://www.mos.ru/"
+1509374991514	Marionette	DEBUG	Received DOM event "pagehide" for "https://www.mos.ru/"
+1509374991514	Marionette	DEBUG	Received DOM event "unload" for "https://www.mos.ru/"
+1509374992811	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967320"
+1509374992812	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967305"
+1509374992813	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967314"
+1509374992813	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967307"
+1509374992814	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967316"
+1509374992815	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967309"
+1509374992815	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967323"
+1509374993377	Marionette	DEBUG	Received DOM event "DOMContentLoaded" for "https://dnevnik.mos.ru/?token=0774b9f21372d5701d8244e6c0c37fde"
+1509374993631	Marionette	DEBUG	Received DOM event "pageshow" for "https://dnevnik.mos.ru/?token=0774b9f21372d5701d8244e6c0c37fde"
+1509374996747	Marionette	DEBUG	Received DOM event "beforeunload" for "https://dnevnik.mos.ru/desktop"
+1509374996910	Marionette	DEBUG	Received DOM event "pagehide" for "https://dnevnik.mos.ru/desktop"
+1509374996910	Marionette	DEBUG	Received DOM event "unload" for "https://dnevnik.mos.ru/desktop"
+1509374998152	Marionette	DEBUG	Received DOM event "DOMContentLoaded" for "https://dnevnik.mos.ru/manage/student_journal/5140898"
+1509374999360	Marionette	DEBUG	Received DOM event "pageshow" for "https://dnevnik.mos.ru/manage/student_journal/5140898"
 Unable to read VR Path Registry from C:\Users\Dmitry\AppData\Local\openvr\openvrpaths.vrpath
-[Parent 6480] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
-[Child 1360] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
-[Child 1360] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 10392] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 10392] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
 *** UTM:SVC TimerManager:registerTimer called after profile-before-change notification. Ignoring timer registration for id: telemetry_modules_ping
 
 ###!!! [Child][MessageChannel::SendAndWait] Error: Channel error: cannot send/recv
 
-r: cannot send/recv
+e 346
+*** UTM:SVC TimerManager:registerTimer called after profile-before-change notification. Ignoring timer registration for id: telemetry_modules_ping
 
-e to read VR Path Registry from C:\Users\Dmitry\AppData\Local\openvr\openvrpaths.vrpath
-/recv
+###!!! [Child][MessageChannel::SendAndWait] Error: Channel error: cannot send/recv
 
+6
+[Child 10396] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+
+###!!! [Child][MessageChannel::SendAndWait] Error: Channel error: cannot send/recv
+
+onette	DEBUG	Received DOM event "unload" for "https://dnevnik.mos.ru/desktop"
+1509369792093	Marionette	DEBUG	Received DOM event "DOMContentLoaded" for "https://dnevnik.mos.ru/manage/student_journal/5140898"
+1509369793229	Marionette	DEBUG	Received DOM event "pageshow" for "https://dnevnik.mos.ru/manage/student_journal/5140898"
+[Child 9240] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 9240] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 3144] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 3144] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
 Unable to read VR Path Registry from C:\Users\Dmitry\AppData\Local\openvr\openvrpaths.vrpath
-] Error: PLayerTransaction::Msg_ReleaseLayer Processing error: message was deserialized, but the handler returned false (indicating failure)
-
-IPDL protocol error: Handler returned error code!
-
-###!!! [Parent][DispatchAsyncMessage] Error: PLayerTransaction::Msg_ReleaseLayer Processing error: message was deserialized, but the handler returned false (indicating failure)
-
-IPDL protocol error: Handler returned error code!
-
-###!!! [Parent][DispatchAsyncMessage] Error: PLayerTransaction::Msg_ReleaseLayer Processing error: message was deserialized, but the handler returned false (indicating failure)
-
-IPDL protocol error: Handler returned error code!
-
-###!!! [Parent][DispatchAsyncMessage] Error: PLayerTransaction::Msg_ReleaseLayer Processing error: message was deserialized, but the handler returned false (indicating failure)
-
-IPDL protocol error: Handler returned error code!
-
-###!!! [Parent][DispatchAsyncMessage] Error: PLayerTransaction::Msg_ReleaseLayer Processing error: message was deserialized, but the handler returned false (indicating failure)
-
+[Child 7016] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 7016] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
 
 ###!!! [Child][MessageChannel::SendAndWait] Error: Channel error: cannot send/recv
 
 Unable to read VR Path Registry from C:\Users\Dmitry\AppData\Local\openvr\openvrpaths.vrpath
-or: PLayerTransaction::Msg_ReleaseLayer Processing error: message was deserialized, but the handler returned false (indicating failure)
+84] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 10184] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\Dmitry\AppData\Local\openvr\openvrpaths.vrpath
+[Child 2532] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 2532] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+
+###!!! [Child][MessageChannel::SendAndWait] Error: Channel error: cannot send/recv
+
+nd/recv
+
+ING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+
+###!!! [Child][MessageChannel::SendAndWait] Error: Channel error: cannot send/recv
+
+d, but the handler returned false (indicating failure)
 
 IPDL protocol error: Handler returned error code!
 
