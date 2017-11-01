@@ -12,6 +12,7 @@ import re
 from datetime import datetime, timedelta
 from ConfigParser import SafeConfigParser 
 from time import sleep
+from smtplib import SMTP
 
 
 
@@ -104,18 +105,21 @@ def get_grades(driver):
 			subj = lesson.find('div', class_="column column-subject")
 			if subj:
 				subject = subj.find('span', class_="break-text").get_text()
-				grade = lesson.find('div', class_="column column-marks").find('span', class_="student-journal-mark")
 				print subject, '\t', 
-				if grade:
-					print grade.get_text()
+				grades = lesson.find('div', class_="column column-marks").find('span', class_="student-journal-mark")	
+				if grades:
+					grade = grades.get_text()
+					print grade
 					check_grade((date, subject, grade))
 				print
 
 
+
 def check_grade(grade):
 	if not grade_exist(grade):
-		send_alert(grade)
 		write_grade_to_DB(grade)
+		send_alert(grade)
+		
 
 
 def grade_exist(grade):
@@ -123,19 +127,21 @@ def grade_exist(grade):
 	con = sql.connect("mosru.db")
 	con.text_factory = str
 	cursor = con.cursor()
-	cursor.execute("SELECT * from grades WHERE date=g AND grade=g AND subj=s ")
+	cursor.execute("SELECT * from grades WHERE day=?", (d,))
+	rezult = cursor.fetchall()
+	print 'its a rezult', rezult
 	con.close()
-	return cursor.fetchall()
+	return rezult
 
 
 def send_mail(header, msg_txt):
-    eUser, ePassword, send, recip, subj = header
-    msg = 'From: %s\nTo: %s\nSubject: %s\n\n%s' % (send, recip, subj, msg_txt)
+    eUser, ePassword, sender, recipient, subject = header
+    msg = 'From: %s\nTo: %s\nSubject: %s\n\n%s' % (sender, recipient, subject, msg_txt)
     try:
-        server = smtplib.SMTP('smtp.gmail.com:587')
+        server = SMTP('smtp.gmail.com:587')
         server.starttls()
         server.login(eUser, ePassword)
-        server.sendmail(send, recip, msg)
+        server.sendmail(sender, recipient, msg_txt)
         print '[+] Email successfully sent'
     except:
         print "[-] Error sending email"
@@ -162,10 +168,11 @@ def send_alert(grade):
 def write_grade_to_DB(grade):
 	con = sql.connect("mosru.db")
 	con.text_factory = str
+	d,s,g = grade
 	with con:
 		cursor = con.cursor()
 		print "Writing information to DataBase.....\n"
-		cursor.execute("INSERT OR IGNORE INTO grades VALUES (?);", grade)
+		cursor.execute("INSERT OR IGNORE INTO grades VALUES (?,?,?,?);", (d,s,g,' '))
 		con.commit()
 
 
