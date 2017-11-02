@@ -110,8 +110,12 @@ def get_grades(driver):
 				grades = lesson.find('div', class_="column column-marks").find('span', class_="student-journal-mark")	
 				if grades:
 					grade = grades.get_text()
-					print grade
-					check_grade((date, subject, grade))
+					print grade,
+					comment = lesson.find('div', class_="column column-marks").find('div', class_="student-journal-mark-info")
+					if comment:
+						print comment.get_text()
+						comment = comment.get_text()
+					check_grade((date, subject, grade, comment))
 				print
 
 
@@ -121,24 +125,28 @@ def check_grade(grade):
 		
 
 def grade_exist(grade):
-	d,s,g = grade
+	d,s,g,c = grade
 	con = sql.connect("mosru.db")
 	con.text_factory = str
 	cursor = con.cursor()
         try:
-	    cursor.execute("INSERT INTO grades VALUES (?,?,?,?);", (d,s,g,' '))
+	    cursor.execute("INSERT INTO grades VALUES (?,?,?,?);", (d,s,g,c))
             con.commit()
             con.close()
-            print 'Write new grade to DB'
+            print '[+] Write new grade to DB......'
             return False
         except sql.IntegrityError:
-            print 'Grade exist in DB'
             con.close()
             return True
 
 
-def send_mail(header, msg_txt):
-	eUser, ePassword, sender, recipient, subject = header
+def send_mail(msg_txt):
+	CONFIG.read(conFile)
+	eUser = CONFIG.get('email', 'user')
+	ePassword = CONFIG.get('email', 'password')
+	sender = CONFIG.get('email', 'sender')
+	subject = CONFIG.get('email', 'subject')
+	recipient = CONFIG.get('email', 'recipients')
 	msg = MIMEMultipart()
 	msg['From'] = sender
 	msg['To'] = recipient
@@ -157,16 +165,9 @@ def send_mail(header, msg_txt):
 
 
 def send_alert(grade):
-	CONFIG.read(conFile)
-	emailUser = CONFIG.get('email', 'user')
-	emailPassword = CONFIG.get('email', 'password')
-	SENDER = CONFIG.get('email', 'sender')
-	SUBJ = CONFIG.get('email', 'subject')
-	RECIPIENT = CONFIG.get('email', 'recipients')
-	mail_header = (emailUser, emailPassword, SENDER, RECIPIENT, SUBJ)
-	d,s,g = grade
-	msg_txt = 'Found new grade:\n%s\n%s\t%s' % (d,s,g)
-	send_mail(mail_header, msg_txt)
+	d,s,g,c = grade
+	msg_txt = '%s\n%s\t%s\t%s' % (d,s,g,c)
+	send_mail(msg_txt)
 	
 	
 def writeDB(task):
