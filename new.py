@@ -13,6 +13,8 @@ from datetime import datetime, timedelta
 from ConfigParser import SafeConfigParser 
 from time import sleep
 from smtplib import SMTP
+from email.MIMEMultipart import MIMEMultipart
+from email.MIMEText import MIMEText
 
 
 
@@ -87,7 +89,6 @@ def get_homeworks(driver):
 	return homeWork
 
 
-
 def get_grades(driver):
 	driver.get(homeURL)
 	mainBody = driver.find_elements_by_class_name("student-journal-day")
@@ -114,40 +115,45 @@ def get_grades(driver):
 				print
 
 
-
 def check_grade(grade):
 	if not grade_exist(grade):
-		write_grade_to_DB(grade)
 		send_alert(grade)
 		
-
 
 def grade_exist(grade):
 	d,s,g = grade
 	con = sql.connect("mosru.db")
 	con.text_factory = str
 	cursor = con.cursor()
-	cursor.execute("SELECT * from grades WHERE day=?", (d,))
-	rezult = cursor.fetchall()
-	print 'its a rezult', rezult
-	con.close()
-	return rezult
+        try:
+	    cursor.execute("INSERT INTO grades VALUES (?,?,?,?);", (d,s,g,' '))
+            con.commit()
+            con.close()
+            print 'Write new grade to DB'
+            return False
+        except sql.IntegrityError:
+            print 'Grade exist in DB'
+            con.close()
+            return True
 
 
 def send_mail(header, msg_txt):
-    eUser, ePassword, sender, recipient, subject = header
-    msg = 'From: %s\nTo: %s\nSubject: %s\n\n%s' % (sender, recipient, subject, msg_txt)
-    try:
-        server = SMTP('smtp.gmail.com:587')
-        server.starttls()
-        server.login(eUser, ePassword)
-        server.sendmail(sender, recipient, msg_txt)
-        print '[+] Email successfully sent'
-    except:
-        print "[-] Error sending email"
-    finally:
-        server.quit()
-
+	eUser, ePassword, sender, recipient, subject = header
+	msg = MIMEMultipart()
+	msg['From'] = sender
+	msg['To'] = recipient
+	msg['Subject'] = subject
+	msg.attach(MIMEText(msg_txt.encode('utf-8'),'plain'))
+	try:
+		server = SMTP('smtp.gmail.com:587')
+		server.starttls()
+		server.login(eUser, ePassword)
+		server.sendmail(sender, recipient, msg.as_string())
+		print '[+] Email successfully sent'
+	except:
+		print "[-] Error sending email"
+	finally:
+		server.quit()
 
 
 def send_alert(grade):
@@ -159,23 +165,9 @@ def send_alert(grade):
 	RECIPIENT = CONFIG.get('email', 'recipients')
 	mail_header = (emailUser, emailPassword, SENDER, RECIPIENT, SUBJ)
 	d,s,g = grade
-	msg_txt = 'Found new grade:\n%s\t%s\t%s' % (d,s,g)
+	msg_txt = 'Found new grade:\n%s\n%s\t%s' % (d,s,g)
 	send_mail(mail_header, msg_txt)
 	
-
-
-
-def write_grade_to_DB(grade):
-	con = sql.connect("mosru.db")
-	con.text_factory = str
-	d,s,g = grade
-	with con:
-		cursor = con.cursor()
-		print "Writing information to DataBase.....\n"
-		cursor.execute("INSERT OR IGNORE INTO grades VALUES (?,?,?,?);", (d,s,g,' '))
-		con.commit()
-
-
 	
 def writeDB(task):
 	con = sql.connect("mosru.db")
@@ -195,7 +187,6 @@ def writeDB(task):
 		cursor.execute("INSERT OR IGNORE INTO dnevnik VALUES (?,?,?,?,?,?,?);", (df,dt,subj,req,descr,dur,comm))
 		con.commit()
 	con.close()
-
 
 
 
