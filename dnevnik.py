@@ -22,7 +22,7 @@ from email.MIMEText import MIMEText
 diaryURL = 'https://www.mos.ru/pgu/ru/application/dogm/journal/'
 loginURL = 'https://www.mos.ru/api/oauth20/v1/frontend/json/ru/process/enter?redirect=https%3A%2F%2Fwww.mos.ru%2F'
 hwURL = 'https://dnevnik.mos.ru/manage/student_homeworks'
-homeURL = 'https://dnevnik.mos.ru/manage/student_journal/5140898'
+gradeURL = 'https://dnevnik.mos.ru/manage/student_journal/5140898'
 
 CONFIG = SafeConfigParser()
 conFile = 'user.conf'
@@ -39,23 +39,6 @@ def get_User():
 	return (user, password)
 
 
-def get_task_by_day(day=''):
-	con = sql.connect("mosru.db")
-	con.text_factory = str
-	cursor = con.cursor()
-	print "Extracting data from DataBase.....\n"
-	if not day:
-		day = tomorrowDay()
-	cursor.execute("SELECT subject,description FROM dnevnik WHERE d_to=?", (day,))
-	rows = cursor.fetchall()
-	print day
-	for row in rows:
-		for i in row:
-			print i.decode('cp1251'),'\t\t',
-		print 
-	con.close()
-
-
 def start():
 	user, password = get_User()
 	driver = webdriver.Firefox()
@@ -70,80 +53,8 @@ def start():
 	return driver
 
 
-def get_homeworks(driver):
-	driver.get(hwURL)
-	week_task = []
-	homeWork = []
-	tasks = driver.find_elements_by_class_name("homework-details")
-	for task in tasks:
-		html = task.get_attribute('innerHTML')
-		soup = BeautifulSoup(html, 'html.parser')
-		week_task.append(soup)
-	for task in week_task:
-		spans = task.find_all('span')
-		tmp = []
-		for span in spans:
-			tmp.append(span.get_text())
-		homeWork.append(tmp)
-#	sleep(3)
-	return homeWork
-
-
-def get_grades(driver):
-	driver.get(homeURL)
-	mainBody = driver.find_elements_by_class_name("student-journal-day")
-	week = []
-	for day in mainBody:
-		html = day.get_attribute('innerHTML')
-		soup = BeautifulSoup(html,'html.parser')
-		week.append(soup)
-	week = week[:-1]
-	print
-	for day in week:
-		date = day.find('span', class_="date").get_text()
-		lessons = day.find_all('div', class_="student-journal-day-lesson")
-		for lesson in lessons:
-			subj = lesson.find('div', class_="column column-subject")
-			if subj:
-				subject = subj.find('span', class_="break-text").get_text()
-				grades = lesson.find('div', class_="column column-marks").find('span', class_="student-journal-mark bold-mark")	
-				if grades:
-					weight = grades.find('span', class_="student-journal-mark-weight")
-					grade = grades.get_text().strip()
-					print date, '\t', subject, '\t',
-					if weight:
-						weight = weight.get_text().strip()
-						grade = grade[0] + ':' + weight
-					print grade, '\t',
-					comment = lesson.find('div', class_="column column-marks").find('div', class_="student-journal-mark-info")
-					if comment:
-						comment = comment.get_text().strip()
-						print '(%s)' %comment				
-					check_grade((date, subject, grade, comment))
-
-
-def check_grade(grade):
-	if not grade_exist(grade):
-		send_alert(grade)
-		
-
-def grade_exist(grade):
-	d,s,g,c = grade
-	con = sql.connect("mosru.db")
-	con.text_factory = str
-	cursor = con.cursor()
-        try:
-	    cursor.execute("INSERT INTO grades VALUES (?,?,?,?);", (d,s,g,c))
-            con.commit()
-            con.close()
-            print '[+] Write new grade to DB......'
-            return False
-        except sql.IntegrityError:
-            con.close()
-            return True
-
-
-def send_mail(msg_txt):
+def send_mail(d,s,g,c):
+	msg_txt = '%s\n%s\t%s\t%s' % (d,s,g,c)
 	CONFIG.read(conFile)
 	eUser = CONFIG.get('email', 'user')
 	ePassword = CONFIG.get('email', 'password')
@@ -167,48 +78,155 @@ def send_mail(msg_txt):
 		server.quit()
 
 
-def send_alert(grade):
-	d,s,g,c = grade
-	msg_txt = '%s\n%s\t%s\t%s' % (d,s,g,c)
-	send_mail(msg_txt)
-	
-	
-def writeDB(task):
+def update_gradeDB(date, subject, grade, comment):
+	con = sql.connect("mosru.db")
+	con.text_factory = str
+	cursor = con.cursor()
+	try:
+	    cursor.execute("INSERT INTO grades VALUES (?,?,?,?);", (date, subject, grade, comment))
+	    con.commit()
+	    print "[+] Writing new grade to DB..........."
+	    send_mail(date, subject, grade, comment)
+	except sql.IntegrityError:
+		print "[-] Error writing to grade DB\t\t(already exist)\t%s : %s" %(date, subject)
+	finally:
+		con.close()
+
+
+def check_grade(drv):
+	drv.get(gradeURL)
+	mainBody = drv.find_elements_by_class_name("student-journal-day")
+	week = []
+	for day in mainBody:
+		html = day.get_attribute('innerHTML')
+		soup = BeautifulSoup(html,'html.parser')
+		week.append(soup)
+	week = week[:-1]
+	for day in week:
+		date = day.find('span', class_="date").get_text()
+		lessons = day.find_all('div', class_="student-journal-day-lesson")
+		for lesson in lessons:
+			subj = lesson.find('div', class_="column column-subject")
+			if subj:
+				subject = subj.find('span', class_="break-text").get_text()
+				grades = lesson.find('div', class_="column column-marks").find('span', class_="student-journal-mark bold-mark")	
+				if grades:
+					grade = grades.get_text().strip()
+					weight = grades.find('span', class_="student-journal-mark-weight")
+					if weight:
+						weight = weight.get_text().strip()
+						grade = grade[0] + ':' + weight
+					comment = lesson.find('div', class_="column column-marks").find('div', class_="student-journal-mark-info")
+					if comment:
+						comment = comment.get_text().strip()
+					update_gradeDB(date, subject, grade, comment)
+	return drv
+
+
+def update_hwDB(date, subject, descr, comment):
 	con = sql.connect("mosru.db")
 	con.text_factory = str
 	cursor = con.cursor()
 	badString = 'Описание ДЗ'.decode('utf8')
-	print "Writing information to DataBase.....\n"
-	for t in task:
-		df = t[0].encode('cp1251')
-		dt = t[1].encode('cp1251')
-		subj = t[2].encode('cp1251')
-		req = ' '
-		descr = t[4].encode('cp1251')
-		descr = (re.sub(badString.encode('cp1251'),'',descr)).strip()
-		dur = t[5].encode('cp1251')
-		comm = ' '
-		cursor.execute("INSERT OR IGNORE INTO dnevnik VALUES (?,?,?,?,?,?,?);", (df,dt,subj,req,descr,dur,comm))
+	task = (re.sub(badString,'',descr)).strip()
+	try:
+		cursor.execute("INSERT INTO homework VALUES (?,?,?,?);", (date, subject, task, comment))
 		con.commit()
+		print '[+] Writing new homework to DB...........'
+	except sql.IntegrityError:
+		print '[-] Error writing to homework DB\t(already exist)\t%s : %s' %(date, subject)
+	finally:
+		con.close()
+
+
+def check_hw(drv):
+	drv.get(hwURL)
+	week_task = []
+	homeWork = []
+	tasks = drv.find_elements_by_class_name("homework-details")
+	for task in tasks:
+		html = task.get_attribute('innerHTML')
+		soup = BeautifulSoup(html, 'html.parser')
+		week_task.append(soup)
+	for task in week_task:
+		date = task.find('div', class_="column date-to").get_text().strip()
+		subject = task.find('div', class_="column subject-name br-text").get_text().strip()
+		description = task.find('div', class_="column description br-text").get_text().strip()
+		comment = task.find('div', class_="column comment").get_text().strip()
+		update_hwDB(date, subject, description, comment)
+	return drv
+
+
+def check_diary():
+	drv = start()
+	check_hw(check_grade(drv))
+	
+
+def print_grade():
+	con = sql.connect("mosru.db")
+	con.text_factory = str
+	cursor = con.cursor()
+	print "Extracting data from DataBase.....\n"
+	cursor.execute("SELECT * FROM grades")
+	rows = cursor.fetchall()
+	for row in rows:
+		for i in row:
+			print i.decode('utf8').encode('cp1251'),'\t\t',
+		print 
 	con.close()
+
+
+def print_dayHW(cur, day):
+	cur.execute("SELECT subject,description FROM homework WHERE date=?", (day,))
+	rows = cur.fetchall()
+	for row in rows:
+		for i in row:
+			print i.decode('utf8').encode('cp1251'),'\t',
+		print 
+
+
+def print_hw(day):
+	con = sql.connect("mosru.db")
+	con.text_factory = str
+	cursor = con.cursor()
+	print "Extracting data from DataBase.....\n"
+	if day != 'week':
+		if day == '':
+			day = tomorrowDay()
+		print '\n',day
+		print_dayHW(cursor, day)
+	else:
+		today = datetime.now()
+		tomorrow = today + timedelta(1)
+		curWeekDay = today.weekday()
+		weekEnd = today + timedelta(4-curWeekDay)
+		N = int(weekEnd.strftime('%d')) - int(today.strftime('%d'))
+		for i in range(N):
+			d = tomorrow.strftime('%d.%m.%Y')
+			print '\n',d
+			print_dayHW(cursor, d)
+			tomorrow += timedelta(1)
+	con.close()
+
+
 
 
 def arg_parse():
 	parser = ArgumentParser(description='API for MOS.RU Electronic Diary checking')
-	parser.add_argument("--action", "-a", type=str, dest='action', choices=['grade','hw', 'update'], default='hw', help='type of action')
+	parser.add_argument("--action", "-a", type=str, dest='action', choices=['grade','hw', 'update'], default='grade', help='type of action')
+	parser.add_argument("--day", "-d", type=str, dest='timeFrame', default='', help='day[dd.mm.yyyy], week or skip it for tomorrow')
 	args = parser.parse_args()
-	return args.action
+	return args.action, args.timeFrame
 
 
 if __name__ == '__main__':
-	drv = start()
-	action = arg_parse()
+	action, timeFrame = arg_parse()
 	if action == 'grade':
-		get_grades(drv)
+		print_grade()
 	if action == 'hw':
-		get_task_by_day()
+		print_hw(timeFrame)
 	if action == 'update':
-		writeDB(get_homeworks(drv))
+		check_diary()
 
 
 
