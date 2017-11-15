@@ -85,10 +85,12 @@ def update_gradeDB(date, subject, grade, comment):
 	try:
 	    cursor.execute("INSERT INTO grades VALUES (?,?,?,?);", (date, subject, grade, comment))
 	    con.commit()
+	    print "Opps! New grade here!"
 	    print "[+] Writing new grade to DB..........."
 	    send_mail(date, subject, grade, comment)
 	except sql.IntegrityError:
-		print "[-] Error writing to grade DB\t\t(already exist)\t%s : %s" %(date, subject)
+		pass
+		#print "[-] Error writing to grade DB\t\t(already exist)\t%s : %s" %(date, subject)
 	finally:
 		con.close()
 
@@ -109,10 +111,11 @@ def check_grade(drv):
 			subj = lesson.find('div', class_="column column-subject")
 			if subj:
 				subject = subj.find('span', class_="break-text").get_text()
-				grades = lesson.find('div', class_="column column-marks").find('span', class_="student-journal-mark bold-mark")	
-				if grades:
-					grade = grades.get_text().strip()
-					weight = grades.find('span', class_="student-journal-mark-weight")
+				grade = lesson.find('div', class_="column column-marks")
+				mark = grade.find(re.compile("^student-journal-mark"))
+				if mark:
+					grade = mark.get_text().strip()[0]
+					weight = mark.find('span', class_="student-journal-mark-weight")
 					if weight:
 						weight = weight.get_text().strip()
 						grade = grade[0] + ':' + weight
@@ -132,9 +135,11 @@ def update_hwDB(date, subject, descr, comment):
 	try:
 		cursor.execute("INSERT INTO homework VALUES (?,?,?,?);", (date, subject, task, comment))
 		con.commit()
+		print 'Oops! New homework found!'
 		print '[+] Writing new homework to DB...........'
 	except sql.IntegrityError:
-		print '[-] Error writing to homework DB\t(already exist)\t%s : %s' %(date, subject)
+		pass
+		#print '[-] Error writing to homework DB\t(already exist)\t%s : %s' %(date, subject)
 	finally:
 		con.close()
 
@@ -170,9 +175,11 @@ def print_grade():
 	cursor.execute("SELECT * FROM grades")
 	rows = cursor.fetchall()
 	for row in rows:
-		for i in row:
-			print i.decode('utf8').encode('cp1251'),'\t\t',
-		print 
+		date = row[0].decode('utf8').encode('cp1251')
+		subj = row[1].decode('utf8').encode('cp1251')
+		grade = row[2].decode('utf8').encode('cp1251')
+		info = row[3].decode('utf8').encode('cp1251')
+		print "%s\t%s\t%s (%s)" %(date, grade, subj, info)
 	con.close()
 
 
